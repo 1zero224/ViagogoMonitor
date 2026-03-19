@@ -1,0 +1,91 @@
+{
+  "grid": {
+    "items": [
+      {
+        "sectionId": 528504,
+        "sectionMapName": "Circle 1",
+        "rowId": 25912,
+        "ticketClass": 2116,
+        "availableTickets": 4,
+        "rawPrice": 130.15,
+        "price": "S$130",
+        "buyerCurrencyCode": "SGD"
+      },
+      {
+        "sectionId": 724531,
+        "sectionMapName": "D",
+        "rowId": 25914,
+        "ticketClass": 303,
+        "availableTickets": 3,
+        "rawPrice": 112.93,
+        "price": "S$113",
+        "buyerCurrencyCode": "SGD"
+      },
+      {
+        "sectionId": 724531,
+        "sectionMapName": "D",
+        "rowId": 25914,
+        "ticketClass": 303,
+        "availableTickets": 2,
+        "rawPrice": 116.25,
+        "price": "S$116",
+        "buyerCurrencyCode": "SGD"
+      },
+      {
+        "sectionId": 724530,
+        "sectionMapName": "C",
+        "rowId": 25796,
+        "ticketClass": 303,
+        "availableTickets": 1,
+        "rawPrice": 120.5,
+        "price": "S$121",
+        "buyerCurrencyCode": "SGD"
+      }
+    ],
+    "venueMapData": {
+      "venueConfiguration": {
+        "entry-1": {
+          "sectionId": 528504,
+          "sectionName": "Circle 1",
+          "ticketClassId": 2116,
+          "rows": [25912]
+        },
+        "entry-2": {
+          "sectionId": 724531,
+          "sectionName": "D",
+          "ticketClassId": 303,
+          "rows": [25914]
+        },
+        "entry-3": {
+          "sectionId": 724530,
+          "sectionName": "C",
+          "ticketClassId": 303,
+          "rows": [25796]
+        },
+        "entry-4": {
+          "sectionId": 724529,
+          "sectionName": "B",
+          "ticketClassId": 303,
+          "rows": [25769]
+        }
+      },
+      "rowPopupData": {},
+      "sectionPopupData": {
+        "2116_528504": {
+          "sourceRowKey": "2116_528504_25912",
+          "count": 5,
+          "ticketCount": 17,
+          "rawMinPrice": 128.77,
+          "formattedMinPrice": "S$129"
+        },
+        "303_724531": {
+          "sourceRowKey": "303_724531_25914",
+          "count": 1,
+          "ticketCount": 3,
+          "rawMinPrice": 112.93,
+          "formattedMinPrice": "S$113"
+        }
+      }
+    }
+  }
+}

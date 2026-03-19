@@ -69,12 +69,119 @@ function buildRowRecord({ sectionId, sectionName, sectionMapName, ticketClassId,
   };
 }
 
+function toNullableNumber(value) {
+  if (value == null || value === '') {
+    return null;
+  }
+
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function normalizeCurrencyCode(value) {
+  const normalized = normalizeWhitespace(value == null ? null : String(value));
+  return normalized ? normalized.toUpperCase() : null;
+}
+
+function createFallbackRowPopupEntry() {
+  return {
+    rawMinPrice: null,
+    formattedMinPrice: null,
+    ticketCount: null,
+    listingCount: null,
+    currencyCode: null,
+  };
+}
+
+function buildSectionPopupFallbackMap(sectionPopupData = {}) {
+  const fallback = {};
+
+  for (const entry of Object.values(sectionPopupData || {})) {
+    const rowKey = normalizeWhitespace(entry?.sourceRowKey);
+    if (!rowKey) {
+      continue;
+    }
+
+    fallback[rowKey] = {
+      rawMinPrice: toNullableNumber(entry.rawMinPrice),
+      formattedMinPrice: normalizeWhitespace(entry.formattedMinPrice),
+      ticketCount: Math.max(0, toNullableNumber(entry.ticketCount) || 0),
+      listingCount: Math.max(0, toNullableNumber(entry.listingCount ?? entry.listingsCount ?? entry.count) || 0),
+      currencyCode: normalizeCurrencyCode(entry.currencyCode || entry.currency || entry.buyerCurrencyCode || entry.listingCurrencyCode),
+    };
+  }
+
+  return fallback;
+}
+
+function buildGridItemFallbackMap(gridItems = []) {
+  const fallback = {};
+
+  for (const item of gridItems || []) {
+    const ticketClassId = item.ticketClass ?? item.ticketClassId ?? null;
+    const sectionId = item.sectionId ?? null;
+    const rowId = item.rowId ?? null;
+    if (ticketClassId == null || sectionId == null || rowId == null) {
+      continue;
+    }
+
+    const rowKey = `${ticketClassId}_${sectionId}_${rowId}`;
+    const existing = fallback[rowKey] || createFallbackRowPopupEntry();
+    const availableTickets = Math.max(0, toNullableNumber(item.availableTickets ?? item.ticketCount) || 0);
+    const rawPrice = toNullableNumber(item.rawPrice ?? item.rawMinPrice ?? item.priceValue);
+    const formattedPrice =
+      normalizeWhitespace(item.formattedMinPrice) ||
+      normalizeWhitespace(item.formattedPrice) ||
+      normalizeWhitespace(item.price) ||
+      null;
+    const currencyCode = normalizeCurrencyCode(item.buyerCurrencyCode || item.currencyCode || item.listingCurrencyCode);
+
+    existing.ticketCount = (existing.ticketCount || 0) + availableTickets;
+    existing.listingCount = (existing.listingCount || 0) + 1;
+
+    if (rawPrice != null && (existing.rawMinPrice == null || rawPrice < existing.rawMinPrice)) {
+      existing.rawMinPrice = rawPrice;
+      existing.formattedMinPrice = formattedPrice || existing.formattedMinPrice;
+    } else if (!existing.formattedMinPrice && formattedPrice) {
+      existing.formattedMinPrice = formattedPrice;
+    }
+
+    if (!existing.currencyCode && currencyCode) {
+      existing.currencyCode = currencyCode;
+    }
+
+    fallback[rowKey] = existing;
+  }
+
+  return fallback;
+}
+
+function buildFallbackRowPopupData(sectionPopupData = {}, gridItems = []) {
+  const sectionFallback = buildSectionPopupFallbackMap(sectionPopupData);
+  const gridFallback = buildGridItemFallbackMap(gridItems);
+  const merged = { ...gridFallback };
+
+  for (const [rowKey, sectionEntry] of Object.entries(sectionFallback)) {
+    const gridEntry = gridFallback[rowKey] || {};
+    merged[rowKey] = {
+      rawMinPrice: sectionEntry.rawMinPrice ?? gridEntry.rawMinPrice ?? null,
+      formattedMinPrice: sectionEntry.formattedMinPrice ?? gridEntry.formattedMinPrice ?? null,
+      ticketCount: sectionEntry.ticketCount ?? gridEntry.ticketCount ?? 0,
+      listingCount: sectionEntry.listingCount ?? gridEntry.listingCount ?? 0,
+      currencyCode: sectionEntry.currencyCode ?? gridEntry.currencyCode ?? null,
+    };
+  }
+
+  return merged;
+}
+
 function getVenueMapSource(jsonData) {
   if (jsonData.grid?.venueMapData?.venueConfiguration) {
     return {
       label: 'grid.venueMapData',
       venueConfiguration: jsonData.grid.venueMapData.venueConfiguration,
       rowPopupData: jsonData.grid.venueMapData.rowPopupData || {},
+      sectionPopupData: jsonData.grid.venueMapData.sectionPopupData || {},
       gridItems: jsonData.grid.items || [],
     };
   }
@@ -84,6 +191,7 @@ function getVenueMapSource(jsonData) {
       label: 'venueMapData',
       venueConfiguration: jsonData.venueMapData.venueConfiguration,
       rowPopupData: jsonData.venueMapData.rowPopupData || {},
+      sectionPopupData: jsonData.venueMapData.sectionPopupData || {},
       gridItems: jsonData.grid?.items || [],
     };
   }
@@ -93,15 +201,17 @@ function getVenueMapSource(jsonData) {
       label: 'venueMapConfiguration',
       venueConfiguration: jsonData.venueMapConfiguration.venueConfiguration,
       rowPopupData: jsonData.venueMapConfiguration.rowPopupData || {},
+      sectionPopupData: jsonData.venueMapConfiguration.sectionPopupData || {},
       gridItems: jsonData.grid?.items || [],
     };
   }
 
-  if (jsonData.venueConfiguration && jsonData.rowPopupData) {
+  if (jsonData.venueConfiguration) {
     return {
       label: 'root',
       venueConfiguration: jsonData.venueConfiguration,
       rowPopupData: jsonData.rowPopupData || {},
+      sectionPopupData: jsonData.sectionPopupData || {},
       gridItems: jsonData.grid?.items || [],
     };
   }
@@ -113,10 +223,11 @@ async function extractAllSectionsFromJSON(jsonData, sectionIdToMapNameFromSvg = 
   console.log('🎯 Extracting sections from index-data...');
   const source = getVenueMapSource(jsonData);
   if (!source) {
-    throw new Error('Missing venueConfiguration or rowPopupData in intercepted JSON');
+    throw new Error('Missing venueConfiguration in intercepted JSON');
   }
 
   console.log(`   📍 Using JSON branch: ${source.label}`);
+  const fallbackRowPopupData = buildFallbackRowPopupData(source.sectionPopupData, source.gridItems);
 
   const sectionIdToVenueEntries = {};
   for (const venueData of Object.values(source.venueConfiguration || {})) {
@@ -199,7 +310,7 @@ async function extractAllSectionsFromJSON(jsonData, sectionIdToMapNameFromSvg = 
             sectionMapName,
             ticketClassId: entry.ticketClassId,
             rowId,
-            rowPopupEntry: source.rowPopupData[rowKey] || null,
+            rowPopupEntry: source.rowPopupData[rowKey] || fallbackRowPopupData[rowKey] || null,
           }),
         );
       }

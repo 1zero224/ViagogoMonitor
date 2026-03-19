@@ -25,6 +25,36 @@ test('extractAllSectionsFromJSON supports the grid.venueMapData branch and emits
   assert.equal(zeroStockRow.dataNotFound, true);
 });
 
+test('extractAllSectionsFromJSON falls back to sectionPopupData and grid items when rowPopupData is empty', async () => {
+  const fixture = loadFixture('index-data.sectionPopupData-fallback.json');
+  const sections = await extractAllSectionsFromJSON(fixture);
+
+  assert.equal(sections.length, 4);
+
+  const sectionPopupRow = sections.find((section) => section.rowKey === '2116_528504_25912');
+  assert.ok(sectionPopupRow);
+  assert.equal(sectionPopupRow.ticketCount, 17);
+  assert.equal(sectionPopupRow.listingCount, 5);
+  assert.equal(sectionPopupRow.price, 128.77);
+  assert.equal(sectionPopupRow.priceFormatted, 'S$129');
+  assert.equal(sectionPopupRow.rowPopupEntry.currencyCode, 'SGD');
+  assert.equal(sectionPopupRow.dataNotFound, false);
+
+  const gridFallbackRow = sections.find((section) => section.rowKey === '303_724530_25796');
+  assert.ok(gridFallbackRow);
+  assert.equal(gridFallbackRow.ticketCount, 1);
+  assert.equal(gridFallbackRow.listingCount, 1);
+  assert.equal(gridFallbackRow.price, 120.5);
+  assert.equal(gridFallbackRow.priceFormatted, 'S$121');
+  assert.equal(gridFallbackRow.rowPopupEntry.currencyCode, 'SGD');
+  assert.equal(gridFallbackRow.dataNotFound, false);
+
+  const stillMissingRow = sections.find((section) => section.rowKey === '303_724529_25769');
+  assert.ok(stillMissingRow);
+  assert.equal(stillMissingRow.ticketCount, 0);
+  assert.equal(stillMissingRow.dataNotFound, true);
+});
+
 test('extractAllSectionsFromJSON supports the venueMapData branch', async () => {
   const fixture = loadFixture('index-data.venueMapData.json');
   const sections = await extractAllSectionsFromJSON(fixture);

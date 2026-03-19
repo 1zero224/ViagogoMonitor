@@ -39,9 +39,15 @@ The scraper currently supports these `index-data` branches:
 - `grid.venueMapData`
 - `venueMapData`
 - `venueMapConfiguration`
-- root-level `venueConfiguration` + `rowPopupData`
+- root-level `venueConfiguration`
 
-The parser emits explicit zero-stock rows when the venue configuration lists a row but `rowPopupData` does not contain inventory for it.
+Row-level inventory resolution now follows this order:
+
+1. `rowPopupData`
+2. `sectionPopupData` mapped back through `sourceRowKey`
+3. aggregated listing rows from `grid.items`
+
+The parser only emits explicit zero-stock rows when the venue configuration lists a row and none of those sources can resolve inventory for it.
 
 ## Previous Snapshot Resolution
 
