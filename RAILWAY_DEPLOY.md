@@ -217,7 +217,7 @@ where schemaname = 'public'
 - 启动命令为：
 
 ```bash
-xvfb-run --auto-servernum --server-args=-screen 0 1920x1080x24 node index.js
+xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" node index.js
 ```
 
 这和 [Dockerfile](./Dockerfile) 里的浏览器运行方式保持一致，避免 Linux 下直接裸跑 `node index.js` 时缺少虚拟显示环境。
@@ -227,6 +227,7 @@ xvfb-run --auto-servernum --server-args=-screen 0 1920x1080x24 node index.js
 - `xvfb-run` 不只依赖 `xvfb`
 - 还依赖镜像内存在 `xauth`
 - 如果缺少 `xauth`，进程会在 Node 启动前直接失败
+- 如果 `--server-args` 没有被引号包住，shell 可能把 `0` 误拆成待执行命令
 
 ### 5.3 新建 Railway 项目
 
@@ -535,7 +536,26 @@ limit 20;
 3. 必要时调大 `JSON_INTERCEPT_TIMEOUT_MS`
 4. 必要时开启 `DUMP_RAW_PAYLOAD_ON_FAILURE=true`
 
-### 12.4 `Missing venueConfiguration or rowPopupData`
+### 12.4 `/usr/bin/xvfb-run: 184: 0: not found`
+
+含义：
+
+- `xvfb-run` 已经找到并开始执行
+- 但 Railway 的 shell 启动命令把 `--server-args=-screen 0 1920x1080x24` 错误拆分了
+- 结果 `0` 被当成了真正要执行的命令
+
+根因：
+
+- [railway.json](./railway.json) 里的 `startCommand` 是 shell 字符串
+- 如果没有写成 `--server-args="-screen 0 1920x1080x24"`，中间空格会被 shell 拆开
+
+处理：
+
+1. 把 Railway 启动命令改成 `xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" node index.js`
+2. 重新触发 Railway build / deploy
+3. 确认启动日志里不再出现 `184: 0: not found`
+
+### 12.5 `Missing venueConfiguration or rowPopupData`
 
 含义：
 
@@ -548,7 +568,7 @@ limit 20;
 3. 分析 dump 出来的 payload
 4. 再修 parser
 
-### 12.5 飞书告警发送失败
+### 12.6 飞书告警发送失败
 
 现象：
 
@@ -561,7 +581,7 @@ limit 20;
 - 检查 Webhook 是否仍然有效
 - 检查飞书群机器人是否被禁用
 
-### 12.6 历史快照写入失败
+### 12.7 历史快照写入失败
 
 现象：
 
@@ -573,7 +593,7 @@ limit 20;
 - 检查 `SUPABASE_ANON_KEY` 是否有对应表写权限
 - 检查 `vgg_inventory_snapshots` 是否已创建
 
-### 12.7 数据库模式下读不到目标
+### 12.8 数据库模式下读不到目标
 
 现象：
 
