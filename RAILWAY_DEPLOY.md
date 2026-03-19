@@ -218,23 +218,28 @@ where schemaname = 'public'
 
 实际启动命令建议直接使用 [Dockerfile](./Dockerfile) 里的 `CMD`，不要再在 Railway 控制台或 `railway.json` 里重复写一份 `Custom Start Command`。
 
-当前 Dockerfile 中的启动命令是：
+当前 Dockerfile 中的运行流程是：
 
 ```bash
-xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" node index.js
+docker-entrypoint.sh
+  -> Xvfb :99 -screen 0 1920x1080x24
+  -> export DISPLAY=:99
+  -> node index.js
 ```
 
-实际容器会先经过一个轻量 entrypoint 脚本，再执行上面的命令。这样做是为了在 Railway runtime logs 里尽早输出：
+实际容器会先经过一个轻量 entrypoint 脚本。这样做是为了在 Railway runtime logs 里尽早输出：
 
 - 容器是否真的开始执行用户进程
-- `xvfb-run` / `chromium` 是否存在
+- `Xvfb` / `chromium` 是否存在
 - `SUPABASE_URL` / `SUPABASE_ANON_KEY` / `FEISHU_BOT_WEBHOOK_URL` / `EVENT_URLS` 是否已注入
+- `DISPLAY` 是否成功导出
+- `node index.js` 是否真的开始执行
 
 这样做的原因是：
 
 - Dockerfile 已经是唯一的运行时真相源
 - 避免 Railway `Custom Start Command` 再覆盖一次镜像默认启动命令
-- 避免 shell / exec-form 参数解析差异导致的额外问题
+- 避免 `xvfb-run` wrapper 本身变成新的黑盒故障点
 
 注意：
 
@@ -529,9 +534,9 @@ limit 20;
 
 处理：
 
-1. 确认 [Dockerfile](./Dockerfile) 的系统依赖里包含 `xauth`
-2. 重新触发 Railway build，不要只重启旧容器
-3. 部署后再次检查启动日志，确认不再出现 `xauth command not found`
+1. 确认当前部署是否还是旧镜像
+2. 如果已经切换到当前仓库版本，优先看 entrypoint 日志，不要再继续围绕 `xvfb-run` 排查
+3. 重新触发 Railway build，不要只重启旧容器
 
 如果你已经拉到了当前仓库的新版本，但 Railway 仍然报同样的错，优先检查：
 
@@ -572,7 +577,22 @@ limit 20;
 3. 重新触发 Railway build / deploy
 4. 确认启动日志里不再出现 `184: 0: not found`
 
-### 12.5 `Missing venueConfiguration or rowPopupData`
+### 12.5 entrypoint 日志停在变量打印之后
+
+现象：
+
+- 能看到 `[entrypoint] SUPABASE_URL=set`
+- 但看不到 `🚀 Viagogo Inventory Monitor starting...`
+
+处理：
+
+1. 查看是否出现 `[entrypoint] starting Xvfb on :99`
+2. 查看是否出现 `[entrypoint] DISPLAY=:99`
+3. 查看是否出现 `[entrypoint] launching node index.js`
+4. 如果停在 `starting Xvfb` 之后，优先排查 Xvfb 自身启动失败
+5. 如果已经看到 `launching node index.js`，再进入 Node 应用层排查
+
+### 12.6 `Missing venueConfiguration or rowPopupData`
 
 含义：
 
@@ -585,7 +605,7 @@ limit 20;
 3. 分析 dump 出来的 payload
 4. 再修 parser
 
-### 12.6 飞书告警发送失败
+### 12.7 飞书告警发送失败
 
 现象：
 
@@ -598,7 +618,7 @@ limit 20;
 - 检查 Webhook 是否仍然有效
 - 检查飞书群机器人是否被禁用
 
-### 12.7 历史快照写入失败
+### 12.8 历史快照写入失败
 
 现象：
 
@@ -610,7 +630,7 @@ limit 20;
 - 检查 `SUPABASE_ANON_KEY` 是否有对应表写权限
 - 检查 `vgg_inventory_snapshots` 是否已创建
 
-### 12.8 数据库模式下读不到目标
+### 12.9 数据库模式下读不到目标
 
 现象：
 
