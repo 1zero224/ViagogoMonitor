@@ -13,17 +13,13 @@ const {
   truncate,
 } = require('./utils');
 
-const USER_AGENTS = [
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0',
-];
-const LISTING_PROGRESS_TIMEOUT_MS = 12000;
+const DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36';
 const LISTING_PROGRESS_POLL_MS = 500;
 const MAX_SHOW_MORE_CLICKS = 20;
+const LISTING_OBSERVATION_LIMIT = 25;
 
-function getRandomUserAgent() {
-  return USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
+function resolveUserAgent(config) {
+  return config.scraperUserAgent || DEFAULT_USER_AGENT;
 }
 
 function upsertSectionRecord(collection, record) {
@@ -231,12 +227,69 @@ function getEventRequestPath(url) {
   }
 }
 
-function isEventListingJsonResponse(responseUrl, targetUrl, contentType) {
+function parseUrl(url) {
+  try {
+    return new URL(url);
+  } catch (error) {
+    return null;
+  }
+}
+
+function selectQuerySummary(parsedUrl) {
+  if (!parsedUrl) {
+    return {};
+  }
+
+  const keys = ['currentPage', 'page', 'pageNumber', 'p', 'quantity', 'qty', 'currency', 'sort'];
+  const summary = {};
+  for (const key of keys) {
+    const value = parsedUrl.searchParams.get(key);
+    if (value != null && value !== '') {
+      summary[key] = value;
+    }
+  }
+
+  return summary;
+}
+
+function resolveQuantity(parsedUrl) {
+  if (!parsedUrl) {
+    return null;
+  }
+
+  return parsedUrl.searchParams.get('quantity') || parsedUrl.searchParams.get('qty') || null;
+}
+
+function isEventListingJsonResponse(responseUrl, targetUrl, contentType, resourceType) {
   if (!/application\/json/i.test(contentType || '')) {
     return false;
   }
 
-  return getEventRequestPath(responseUrl) === getEventRequestPath(targetUrl);
+  if (!['fetch', 'xhr'].includes(resourceType)) {
+    return false;
+  }
+
+  const parsedResponseUrl = parseUrl(responseUrl);
+  const parsedTargetUrl = parseUrl(targetUrl);
+  if (!parsedResponseUrl || !parsedTargetUrl) {
+    return getEventRequestPath(responseUrl) === getEventRequestPath(targetUrl);
+  }
+
+  if (parsedResponseUrl.origin !== parsedTargetUrl.origin) {
+    return false;
+  }
+
+  if (parsedResponseUrl.pathname.replace(/\/+$/, '') !== parsedTargetUrl.pathname.replace(/\/+$/, '')) {
+    return false;
+  }
+
+  const targetQuantity = resolveQuantity(parsedTargetUrl);
+  const responseQuantity = resolveQuantity(parsedResponseUrl);
+  if (targetQuantity && responseQuantity && targetQuantity !== responseQuantity) {
+    return false;
+  }
+
+  return true;
 }
 
 function extractListingItemsFromPayload(payload) {
@@ -260,6 +313,150 @@ function dedupeListingItems(items = []) {
   }
 
   return [...deduped.values()];
+}
+
+function resolveListingPageNumber(responseUrl, payload) {
+  const candidates = [
+    payload?.currentPage,
+    parseUrl(responseUrl)?.searchParams.get('currentPage'),
+    parseUrl(responseUrl)?.searchParams.get('page'),
+    parseUrl(responseUrl)?.searchParams.get('pageNumber'),
+    parseUrl(responseUrl)?.searchParams.get('p'),
+  ];
+
+  for (const candidate of candidates) {
+    const parsed = Number(candidate);
+    if (Number.isFinite(parsed) && parsed >= 1) {
+      return parsed;
+    }
+  }
+
+  return null;
+}
+
+function buildListingResponseSummary(responseUrl, payload) {
+  const items = extractListingItemsFromPayload(payload);
+  const parsedUrl = parseUrl(responseUrl);
+  const pageNumber = resolveListingPageNumber(responseUrl, payload);
+  const firstItem = items[0] || {};
+
+  return {
+    responseUrl,
+    path: parsedUrl?.pathname || getEventRequestPath(responseUrl),
+    query: selectQuerySummary(parsedUrl),
+    currentPage: pageNumber,
+    totalCount: Number.isFinite(Number(payload?.totalCount)) ? Number(payload.totalCount) : null,
+    itemCount: items.length,
+    firstListingId: firstItem.id ?? firstItem.listingId ?? null,
+    observedAt: new Date().toISOString(),
+  };
+}
+
+function getListingBatchKey(summary) {
+  if (summary.currentPage != null) {
+    return `page:${summary.currentPage}`;
+  }
+
+  const queryPairs = Object.entries(summary.query || {})
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([key, value]) => `${key}=${value}`);
+  return `request:${summary.path}?${queryPairs.join('&')}`;
+}
+
+function shouldReplaceListingBatch(existing, candidate) {
+  if (!existing) {
+    return true;
+  }
+
+  if ((candidate.itemCount || 0) !== (existing.itemCount || 0)) {
+    return (candidate.itemCount || 0) > (existing.itemCount || 0);
+  }
+
+  if ((candidate.totalCount || 0) !== (existing.totalCount || 0)) {
+    return (candidate.totalCount || 0) > (existing.totalCount || 0);
+  }
+
+  return candidate.observedAt > existing.observedAt;
+}
+
+function recordListingBatchObservation(listingBatchState, summary, items) {
+  const observation = {
+    ...summary,
+    selected: false,
+  };
+  listingBatchState.observations.push(observation);
+  if (listingBatchState.observations.length > LISTING_OBSERVATION_LIMIT) {
+    listingBatchState.observations.shift();
+  }
+
+  if (!items.length) {
+    return;
+  }
+
+  const batchKey = getListingBatchKey(summary);
+  const candidate = {
+    ...summary,
+    batchKey,
+    items,
+  };
+  const existing = listingBatchState.batchesByKey.get(batchKey);
+  if (existing && (
+    existing.itemCount !== candidate.itemCount
+    || existing.totalCount !== candidate.totalCount
+    || existing.firstListingId !== candidate.firstListingId
+  )) {
+    listingBatchState.conflicts.push({
+      batchKey,
+      currentPage: candidate.currentPage,
+      previousItemCount: existing.itemCount,
+      nextItemCount: candidate.itemCount,
+      previousTotalCount: existing.totalCount,
+      nextTotalCount: candidate.totalCount,
+      previousFirstListingId: existing.firstListingId,
+      nextFirstListingId: candidate.firstListingId,
+    });
+  }
+
+  if (shouldReplaceListingBatch(existing, candidate)) {
+    if (existing) {
+      listingBatchState.replacements.push({
+        batchKey,
+        currentPage: candidate.currentPage,
+        previousItemCount: existing.itemCount,
+        nextItemCount: candidate.itemCount,
+        previousTotalCount: existing.totalCount,
+        nextTotalCount: candidate.totalCount,
+      });
+    }
+    listingBatchState.batchesByKey.set(batchKey, candidate);
+    listingBatchState.version += 1;
+  }
+}
+
+function summarizeSelectedListingBatches(listingBatchState) {
+  return [...listingBatchState.batchesByKey.values()]
+    .sort((left, right) => {
+      if (left.currentPage != null && right.currentPage != null) {
+        return left.currentPage - right.currentPage;
+      }
+      if (left.currentPage != null) {
+        return -1;
+      }
+      if (right.currentPage != null) {
+        return 1;
+      }
+      return left.batchKey.localeCompare(right.batchKey);
+    })
+    .map(({ items, ...summary }) => summary);
+}
+
+function buildListingStateFingerprint(progress, listingBatchState) {
+  return JSON.stringify({
+    shownCount: progress?.shownCount ?? null,
+    totalCount: progress?.totalCount ?? null,
+    hasShowMore: Boolean(progress?.hasShowMore),
+    version: listingBatchState.version,
+  });
 }
 
 async function getListingProgress(page) {
@@ -291,31 +488,49 @@ async function clickShowMore(page) {
   });
 }
 
-async function waitForListingProgressUpdate(page, listingBatchState, previousProgress, previousBatchCount) {
+async function waitForListingStateStabilized(page, listingBatchState, options = {}) {
+  const timeoutMs = Math.max(1000, Number(options.timeoutMs) || 12000);
+  const stableWindowMs = Math.max(250, Number(options.stableWindowMs) || 1500);
   const startedAt = Date.now();
+  let progress = await getListingProgress(page);
+  let fingerprint = buildListingStateFingerprint(progress, listingBatchState);
+  let lastChangedAt = Date.now();
+  let changed = false;
 
-  while (Date.now() - startedAt < LISTING_PROGRESS_TIMEOUT_MS) {
-    const progress = await getListingProgress(page);
-    if (listingBatchState.batches.length > previousBatchCount) {
-      return progress;
-    }
-    if (
-      progress.shownCount != null &&
-      previousProgress.shownCount != null &&
-      progress.shownCount > previousProgress.shownCount
-    ) {
-      return progress;
-    }
-
+  while (Date.now() - startedAt < timeoutMs) {
     await new Promise((resolve) => setTimeout(resolve, LISTING_PROGRESS_POLL_MS));
+    progress = await getListingProgress(page);
+    const nextFingerprint = buildListingStateFingerprint(progress, listingBatchState);
+    if (nextFingerprint !== fingerprint) {
+      fingerprint = nextFingerprint;
+      lastChangedAt = Date.now();
+      changed = true;
+      continue;
+    }
+
+    if (Date.now() - lastChangedAt >= stableWindowMs) {
+      return {
+        progress,
+        stabilized: true,
+        changed,
+        durationMs: Date.now() - startedAt,
+      };
+    }
   }
 
-  return getListingProgress(page);
+  return {
+    progress: await getListingProgress(page),
+    stabilized: false,
+    changed,
+    durationMs: Date.now() - startedAt,
+  };
 }
 
-async function collectAllListingItems(page, target, initialJson, listingBatchState) {
+async function collectAllListingItems(page, target, initialJson, listingBatchState, config) {
   const source = getVenueMapSource(initialJson);
   const initialItems = dedupeListingItems(source?.gridItems || []);
+  const settleEvents = [];
+  const warnings = [];
   let progress = await getListingProgress(page);
   let clickCount = 0;
 
@@ -326,25 +541,55 @@ async function collectAllListingItems(page, target, initialJson, listingBatchSta
     progress.shownCount < progress.totalCount &&
     clickCount < MAX_SHOW_MORE_CLICKS
   ) {
-    const previousBatchCount = listingBatchState.batches.length;
     const clicked = await clickShowMore(page);
     if (!clicked) {
       break;
     }
 
     clickCount += 1;
-    progress = await waitForListingProgressUpdate(page, listingBatchState, progress, previousBatchCount);
+    const settleResult = await waitForListingStateStabilized(page, listingBatchState, {
+      timeoutMs: config.listingProgressTimeoutMs,
+      stableWindowMs: config.listingStableWindowMs,
+    });
+    progress = settleResult.progress;
+    settleEvents.push({
+      phase: `click_${clickCount}`,
+      ...settleResult,
+    });
+
+    if (!settleResult.changed) {
+      warnings.push(`show_more_click_${clickCount}_produced_no_listing_state_change`);
+      break;
+    }
   }
 
-  const finalProgress = await getListingProgress(page);
-  const extraItems = dedupeListingItems(listingBatchState.batches.flatMap((batch) => batch.items));
+  const finalSettle = await waitForListingStateStabilized(page, listingBatchState, {
+    timeoutMs: config.listingFinalSettleTimeoutMs,
+    stableWindowMs: config.listingStableWindowMs,
+  });
+  const finalProgress = finalSettle.progress;
+  const selectedBatches = summarizeSelectedListingBatches(listingBatchState);
+  const extraItems = dedupeListingItems([...listingBatchState.batchesByKey.values()].flatMap((batch) => batch.items));
   const listingItems = dedupeListingItems([...initialItems, ...extraItems]);
+  if (finalProgress.totalCount != null && listingItems.length !== finalProgress.totalCount) {
+    warnings.push(`listing_count_mismatch:${listingItems.length}/${finalProgress.totalCount}`);
+  }
+  if (listingBatchState.conflicts.length > 0) {
+    warnings.push(`listing_batch_conflicts:${listingBatchState.conflicts.length}`);
+  }
 
   return {
     listingItems,
     progress: finalProgress,
     clickCount,
-    batchCount: listingBatchState.batches.length,
+    batchCount: selectedBatches.length,
+    selectedBatches,
+    observations: listingBatchState.observations,
+    conflicts: listingBatchState.conflicts,
+    replacements: listingBatchState.replacements,
+    settleEvents,
+    finalSettle,
+    warnings,
   };
 }
 
@@ -598,9 +843,11 @@ async function scrapeEventTarget(target, config, runId) {
   let browser = null;
   let interceptedJsonData = null;
   const listingBatchState = {
-    batches: [],
-    seenPages: new Set(),
-    seenSignatures: new Set(),
+    batchesByKey: new Map(),
+    observations: [],
+    conflicts: [],
+    replacements: [],
+    version: 0,
   };
   let resolveJsonData;
   const jsonDataPromise = new Promise((resolve) => {
@@ -635,7 +882,7 @@ async function scrapeEventTarget(target, config, runId) {
     browser = connection.browser;
     const { page } = connection;
 
-    const userAgent = getRandomUserAgent();
+    const userAgent = resolveUserAgent(config);
     await page.setUserAgent(userAgent);
     await page.setViewport({
       width: 1920,
@@ -650,26 +897,14 @@ async function scrapeEventTarget(target, config, runId) {
     page.on('response', async (response) => {
       const responseUrl = response.url();
       const contentType = response.headers()['content-type'] || '';
+      const resourceType = response.request().resourceType();
 
       try {
-        if (isEventListingJsonResponse(responseUrl, target.url, contentType)) {
+        if (isEventListingJsonResponse(responseUrl, target.url, contentType, resourceType)) {
           const payload = JSON.parse(await response.text());
           const items = extractListingItemsFromPayload(payload);
-          if (items.length > 0) {
-            const pageNumber = payload.currentPage ?? null;
-            const signature = `${pageNumber ?? 'unknown'}:${items[0]?.id ?? items[0]?.listingId ?? 'empty'}:${items.length}`;
-            if (!listingBatchState.seenPages.has(pageNumber) && !listingBatchState.seenSignatures.has(signature)) {
-              if (pageNumber != null) {
-                listingBatchState.seenPages.add(pageNumber);
-              }
-              listingBatchState.seenSignatures.add(signature);
-              listingBatchState.batches.push({
-                currentPage: pageNumber,
-                totalCount: payload.totalCount ?? null,
-                items,
-              });
-            }
-          }
+          const responseSummary = buildListingResponseSummary(responseUrl, payload);
+          recordListingBatchObservation(listingBatchState, responseSummary, items);
           return;
         }
 
@@ -732,7 +967,13 @@ async function scrapeEventTarget(target, config, runId) {
       throw new Error('No sections extracted from JSON payload');
     }
 
-    const listingCollection = await collectAllListingItems(page, target, interceptedJsonData, listingBatchState);
+    const listingCollection = await collectAllListingItems(page, target, interceptedJsonData, listingBatchState, config);
+    if (listingCollection.conflicts.length > 0) {
+      console.warn(`⚠️ Conflicting listing batch responses detected: ${listingCollection.conflicts.length}`);
+    }
+    if (listingCollection.warnings.length > 0) {
+      console.warn(`⚠️ Listing collection warnings: ${listingCollection.warnings.join(', ')}`);
+    }
     console.log(
       `🧾 Listing pages loaded: initial=${getVenueMapSource(interceptedJsonData)?.gridItems?.length || 0}, extraPages=${listingCollection.batchCount}, totalListings=${listingCollection.listingItems.length}`,
     );
@@ -756,6 +997,14 @@ async function scrapeEventTarget(target, config, runId) {
         listingBatchCount: listingCollection.batchCount,
         listingShowMoreClicks: listingCollection.clickCount,
         listingProgress: listingCollection.progress,
+        scraperUserAgent: userAgent,
+        listingObservationWarnings: listingCollection.warnings,
+        listingResponseObservations: listingCollection.observations,
+        selectedListingBatches: listingCollection.selectedBatches,
+        listingBatchConflicts: listingCollection.conflicts,
+        listingBatchReplacements: listingCollection.replacements,
+        listingSettleEvents: listingCollection.settleEvents,
+        listingFinalSettle: listingCollection.finalSettle,
         runId,
       },
     });
@@ -791,6 +1040,9 @@ async function scrapeEventTarget(target, config, runId) {
 }
 
 module.exports = {
+  buildListingResponseSummary,
   extractAllSectionsFromJSON,
+  isEventListingJsonResponse,
   scrapeEventTarget,
+  shouldReplaceListingBatch,
 };

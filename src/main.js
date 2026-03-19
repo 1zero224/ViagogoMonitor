@@ -1,11 +1,12 @@
 const { loadConfig, validateRuntimeConfig } = require('./config');
+const { buildAlertDiff } = require('./alerting');
 const { diffSnapshots, filterDiffForAlerts } = require('./diff');
 const { buildCompatibilitySnapshot } = require('./normalize');
 const { initializeFeishuNotifier, sendInventoryNotification } = require('./notify');
 const { scrapeEventTarget } = require('./scraper');
 const {
   createSupabaseClient,
-  getLatestPreviousSnapshot,
+  getRecentPreviousSnapshots,
   insertInventoryDiff,
   insertInventorySnapshot,
   markDiffAlertSent,
@@ -25,12 +26,18 @@ async function processTarget({ target, supabase, feishuWebhookUrl, config, runId
   }
 
   const snapshot = scrapeResult.snapshot;
-  const previousSnapshotResult = await getLatestPreviousSnapshot(supabase, config, target);
-  if (previousSnapshotResult.error) {
-    console.warn(`⚠️ Failed to read historical snapshot: ${previousSnapshotResult.error.message}`);
+  const previousSnapshotsResult = await getRecentPreviousSnapshots(
+    supabase,
+    config,
+    target,
+    config.listingAvailabilityConfirmRuns,
+  );
+  if (previousSnapshotsResult.error) {
+    console.warn(`⚠️ Failed to read historical snapshot: ${previousSnapshotsResult.error.message}`);
   }
 
-  let previousSnapshot = previousSnapshotResult.snapshot;
+  const historicalSnapshots = previousSnapshotsResult.snapshots || [];
+  let previousSnapshot = historicalSnapshots[0] || null;
   if (!previousSnapshot && target.previousprices && Object.keys(target.previousprices).length > 0) {
     previousSnapshot = buildCompatibilitySnapshot({
       eventUrl: target.url,
@@ -51,7 +58,27 @@ async function processTarget({ target, supabase, feishuWebhookUrl, config, runId
   const diff = diffSnapshots(previousSnapshot, snapshot, {
     minTicketDelta: config.minTicketDelta,
   });
-  const alertDiff = filterDiffForAlerts(diff, config);
+  const debouncedDiff = buildAlertDiff({
+    diff,
+    currentSnapshot: snapshot,
+    previousSnapshots: historicalSnapshots,
+    config,
+  });
+  const alertDiff = filterDiffForAlerts(debouncedDiff, config);
+  snapshot.meta.alerting = {
+    rawDiffChangeCount: diff.changeCount,
+    finalAlertChangeCount: alertDiff.changeCount,
+    debounce: debouncedDiff.debounce,
+  };
+
+  if (debouncedDiff.debounce?.enabled) {
+    console.log(
+      `ℹ️ Listing availability debounce: confirmRuns=${debouncedDiff.debounce.confirmRuns}, suppressedRaw=${debouncedDiff.debounce.suppressedRawAvailabilityChangeCount}, emittedDebounced=${debouncedDiff.debounce.emittedDebouncedAvailabilityChangeCount}`,
+    );
+    if (debouncedDiff.debounce.insufficientHistory && debouncedDiff.debounce.suppressedRawAvailabilityChangeCount > 0) {
+      console.log('   ℹ️ Insufficient snapshot history for confirmed listing add/remove alerts; raw availability changes suppressed.');
+    }
+  }
 
   const snapshotInsert = await insertInventorySnapshot(supabase, config, snapshot, target);
   if (snapshotInsert.error) {
@@ -67,7 +94,7 @@ async function processTarget({ target, supabase, feishuWebhookUrl, config, runId
       config,
       diff,
       snapshotInsert.snapshotId,
-      previousSnapshotResult.record?.id ?? null,
+      previousSnapshotsResult.records?.[0]?.id ?? null,
     );
     if (diffInsert.error) {
       console.warn(`⚠️ Failed to persist diff document: ${diffInsert.error.message}`);

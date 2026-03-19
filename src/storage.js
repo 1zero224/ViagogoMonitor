@@ -20,12 +20,12 @@ function normalizeSnapshotRecord(record) {
   };
 }
 
-async function getLatestPreviousSnapshot(supabase, config, target) {
+function buildSnapshotHistoryQuery(supabase, config, target, limit) {
   let query = supabase
     .from(config.historyTable)
     .select('id, link_id, event_id, event_url, captured_at, snapshot_json')
     .order('captured_at', { ascending: false })
-    .limit(1);
+    .limit(limit);
 
   if (target.linkId != null) {
     query = query.eq('link_id', target.linkId);
@@ -35,7 +35,11 @@ async function getLatestPreviousSnapshot(supabase, config, target) {
     query = query.eq('event_url', target.url);
   }
 
-  const { data, error } = await query;
+  return query;
+}
+
+async function getLatestPreviousSnapshot(supabase, config, target) {
+  const { data, error } = await buildSnapshotHistoryQuery(supabase, config, target, 1);
   if (error) {
     return { snapshot: null, record: null, error };
   }
@@ -44,6 +48,26 @@ async function getLatestPreviousSnapshot(supabase, config, target) {
   return {
     snapshot: normalizeSnapshotRecord(record),
     record,
+    error: null,
+  };
+}
+
+async function getRecentPreviousSnapshots(supabase, config, target, limit = 2) {
+  const { data, error } = await buildSnapshotHistoryQuery(
+    supabase,
+    config,
+    target,
+    Math.max(1, Number(limit) || 1),
+  );
+
+  if (error) {
+    return { snapshots: [], records: [], error };
+  }
+
+  const records = data || [];
+  return {
+    snapshots: records.map(normalizeSnapshotRecord).filter(Boolean),
+    records,
     error: null,
   };
 }
@@ -126,6 +150,7 @@ async function updateCompatibilityCache(supabase, config, target, snapshot) {
 module.exports = {
   createSupabaseClient,
   getLatestPreviousSnapshot,
+  getRecentPreviousSnapshots,
   insertInventoryDiff,
   insertInventorySnapshot,
   markDiffAlertSent,

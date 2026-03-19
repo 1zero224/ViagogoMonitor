@@ -37,6 +37,8 @@ test('loadConfig strips wrapping quotes from Railway-style env values', () => {
       MONITOR_MODE: '"inventory"',
       EVENT_URLS: '"https://www.viagogo.com/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465?backUrl=%2FConcert-Tickets%2FOther-Concerts%2FZUTOMAYO-Tickets&lt=40.7128&lg=-74.006"',
       ALERT_ON_STOCK_APPEAR: '"false"',
+      DEBOUNCE_LISTING_AVAILABILITY_ALERTS: '"false"',
+      LISTING_AVAILABILITY_CONFIRM_RUNS: '"3"',
       PERSIST_DIFFS: '"true"',
       NAVIGATION_TIMEOUT_MS: '"12345"',
     },
@@ -52,6 +54,8 @@ test('loadConfig strips wrapping quotes from Railway-style env values', () => {
         'https://www.viagogo.com/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465?backUrl=%2FConcert-Tickets%2FOther-Concerts%2FZUTOMAYO-Tickets&lt=40.7128&lg=-74.006',
       ]);
       assert.equal(config.alertOnStockAppear, false);
+      assert.equal(config.debounceListingAvailabilityAlerts, false);
+      assert.equal(config.listingAvailabilityConfirmRuns, 3);
       assert.equal(config.persistDiffs, true);
       assert.equal(config.navigationTimeoutMs, 12345);
     },

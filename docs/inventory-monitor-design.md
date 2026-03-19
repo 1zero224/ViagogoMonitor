@@ -64,6 +64,8 @@ The parser only emits explicit zero-stock rows when the venue configuration list
 
 For listing-level monitoring, the scraper also clicks `Show more` until the page reaches `Showing N of N`, and collects the paginated JSON listing batches returned by the event endpoint itself.
 
+The runtime now prefers a stable browser fingerprint by default, narrows listing JSON interception to same-origin XHR/fetch responses for the event path, and keeps per-page response diagnostics so later duplicate or conflicting batches can be inspected from `snapshot.meta`.
+
 ## Previous Snapshot Resolution
 
 The runtime resolves the previous snapshot in this order:
@@ -93,6 +95,8 @@ The diff engine classifies:
 - `listing_price_increased`
 
 Alert filters are applied after diff generation so the stored diff can remain complete.
+
+Listing availability alerts (`new_listing_available`, `listing_removed`) are additionally debounced against recent snapshot history before notification delivery. The raw diff is still persisted unchanged; only the alert-facing diff is stabilized.
 
 ## Persistence Strategy
 

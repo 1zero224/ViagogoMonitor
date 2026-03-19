@@ -81,8 +81,15 @@ MAX_DIFF_ITEMS_IN_ALERT=10
 NAVIGATION_TIMEOUT_MS=80000
 JSON_INTERCEPT_TIMEOUT_MS=15000
 SECTION_MAP_TIMEOUT_MS=15000
+LISTING_PROGRESS_TIMEOUT_MS=12000
+LISTING_STABLE_WINDOW_MS=1500
+LISTING_FINAL_SETTLE_TIMEOUT_MS=5000
 BETWEEN_TARGET_DELAY_MIN_MS=10000
 BETWEEN_TARGET_DELAY_MAX_MS=20000
+
+SCRAPER_USER_AGENT=Mozilla/5.0 ...
+DEBOUNCE_LISTING_AVAILABILITY_ALERTS=true
+LISTING_AVAILABILITY_CONFIRM_RUNS=2
 
 WRITE_PREVIOUSPRICES_CACHE=true
 PERSIST_DIFFS=false
@@ -133,6 +140,8 @@ Fixtures under [`fixtures/`](./fixtures/) are synthetic contract fixtures for th
 ## Operational Notes
 
 - the scraper still relies on Viagogo's live anti-bot behavior; timeouts and intermittent failures are expected
+- listing add/remove alerts are now debounced by recent snapshot history, while raw snapshots and raw diffs still preserve the immediate observation
+- snapshot `meta` now stores scraper diagnostics such as `scraperUserAgent`, listing response summaries, replacement/conflict traces, and settle warnings
 - if the JSON structure drifts, enable `DUMP_RAW_PAYLOAD_ON_FAILURE=true` to capture the payload for debugging
 - the historical snapshot insert can fail independently from the compatibility cache update; the logs call this out explicitly
 - Feishu bot alerts are sent only when a previous snapshot exists and the filtered diff is non-empty
