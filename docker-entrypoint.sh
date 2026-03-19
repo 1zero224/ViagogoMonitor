@@ -16,6 +16,12 @@ else
   echo "[entrypoint] SUPABASE_URL=missing"
 fi
 
+if [ -n "${SUPABASE_SERVICE_ROLE_KEY:-}" ]; then
+  echo "[entrypoint] SUPABASE_SERVICE_ROLE_KEY=set"
+else
+  echo "[entrypoint] SUPABASE_SERVICE_ROLE_KEY=missing"
+fi
+
 if [ -n "${SUPABASE_ANON_KEY:-}" ]; then
   echo "[entrypoint] SUPABASE_ANON_KEY=set"
 else

@@ -45,6 +45,7 @@ test('loadConfig strips wrapping quotes from Railway-style env values', () => {
 
       assert.equal(config.supabaseUrl, 'https://example.supabase.co');
       assert.equal(config.supabaseAnonKey, 'quoted-anon-key');
+      assert.equal(config.supabaseCredentialSource, 'anon');
       assert.equal(config.feishuBotWebhookUrl, 'https://open.feishu.cn/open-apis/bot/v2/hook/token');
       assert.equal(config.monitorMode, 'inventory');
       assert.deepEqual(config.eventUrls, [
@@ -67,6 +68,7 @@ test('loadConfig prefers SUPABASE_SERVICE_ROLE_KEY over SUPABASE_ANON_KEY', () =
     () => {
       const config = loadConfig([]);
       assert.equal(config.supabaseAnonKey, 'service-role-key');
+      assert.equal(config.supabaseCredentialSource, 'service_role');
     },
   );
 });

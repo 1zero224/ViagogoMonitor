@@ -123,6 +123,7 @@ async function main(argv = []) {
   console.log('🚀 Viagogo Inventory Monitor starting...');
   console.log(`🆔 Run ID: ${runId}`);
   console.log(`🎯 Mode: ${config.monitorMode}`);
+  console.log(`🔐 Supabase credential: ${config.supabaseCredentialSource || 'missing'}`);
   console.log(`🎯 Filters: Artist="${config.artistFilter || 'ALL'}", Country="${config.countryFilter || 'ALL'}"`);
   if (config.eventUrls.length > 0) {
     console.log(`🔗 Direct event mode: ${config.eventUrls.length} URL(s) from CLI/env`);

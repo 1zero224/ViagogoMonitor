@@ -48,10 +48,13 @@ function parseCliArgs(argv = []) {
 
 function loadConfig(argv = []) {
   const cli = parseCliArgs(argv);
+  const supabaseServiceRoleKey = stripWrappingQuotes(process.env.SUPABASE_SERVICE_ROLE_KEY) || null;
+  const supabaseAnonKey = stripWrappingQuotes(process.env.SUPABASE_ANON_KEY) || null;
 
   return {
     supabaseUrl: stripWrappingQuotes(process.env.SUPABASE_URL) || null,
-    supabaseAnonKey: stripWrappingQuotes(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY) || null,
+    supabaseAnonKey: supabaseServiceRoleKey || supabaseAnonKey,
+    supabaseCredentialSource: supabaseServiceRoleKey ? 'service_role' : (supabaseAnonKey ? 'anon' : null),
     feishuBotWebhookUrl: stripWrappingQuotes(process.env.FEISHU_BOT_WEBHOOK_URL || process.env.FEISHU_WEBHOOK_URL) || null,
     artistFilter: stripWrappingQuotes(process.env.ARTIST_FILTER) || null,
     countryFilter: stripWrappingQuotes(process.env.COUNTRY_FILTER) || null,
