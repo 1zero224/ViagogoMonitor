@@ -24,69 +24,83 @@ function buildSummaryField(snapshot, diff) {
   const minPriceDelta = diff.summaryChanges.minPriceDelta;
   const minPriceLine =
     snapshot.summary.minPrice == null
-      ? 'Min price: n/a'
-      : `Min price: ${formatMoney(snapshot.summary.minPrice, currency)}${
+      ? '最低价: 暂无'
+      : `最低价: ${formatMoney(snapshot.summary.minPrice, currency)}${
           typeof minPriceDelta === 'number' ? ` (${formatSignedNumber(minPriceDelta, 2)})` : ''
         }`;
 
   return [
-    `Rows with stock: ${snapshot.summary.rowsWithStock} (${formatSignedNumber(diff.summaryChanges.rowsWithStockDelta)})`,
-    `Sections with stock: ${snapshot.summary.sectionsWithStock} (${formatSignedNumber(diff.summaryChanges.sectionsWithStockDelta)})`,
-    `Total listings: ${snapshot.summary.totalListingCount} (${formatSignedNumber(diff.summaryChanges.totalListingCountDelta)})`,
-    `Total tickets: ${snapshot.summary.totalTicketCount} (${formatSignedNumber(diff.summaryChanges.totalTicketCountDelta)})`,
+    `有票行数: ${snapshot.summary.rowsWithStock} (${formatSignedNumber(diff.summaryChanges.rowsWithStockDelta)})`,
+    `有票分区数: ${snapshot.summary.sectionsWithStock} (${formatSignedNumber(diff.summaryChanges.sectionsWithStockDelta)})`,
+    `挂单总数: ${snapshot.summary.totalListingCount} (${formatSignedNumber(diff.summaryChanges.totalListingCountDelta)})`,
+    `票数总计: ${snapshot.summary.totalTicketCount} (${formatSignedNumber(diff.summaryChanges.totalTicketCountDelta)})`,
     minPriceLine,
   ];
 }
 
-function describeChange(change, currency) {
+function formatLocation(change) {
   const locationParts = [change.sectionName];
   if (change.rowId) {
-    locationParts.push(`Row ${change.rowId}`);
+    locationParts.push(`行 ${change.rowId}`);
   }
   if (change.seat) {
-    locationParts.push(`Seat ${change.seat}`);
+    locationParts.push(`座位 ${change.seat}`);
   }
   if (change.listingId) {
-    locationParts.push(`Listing ${change.listingId}`);
+    locationParts.push(`挂单 ${change.listingId}`);
   }
 
-  const location = locationParts.filter(Boolean).join(' / ');
+  return locationParts.filter(Boolean).join(' / ');
+}
+
+function describeComparisonMode(mode) {
+  if (mode === 'listing') {
+    return '挂单级';
+  }
+  if (mode === 'row') {
+    return '行级';
+  }
+  return mode || '未知';
+}
+
+function describeChange(change, currency) {
+  const location = formatLocation(change);
 
   switch (change.type) {
     case 'new_row_available':
-      return `New row available: ${location} | tickets ${change.newTicketCount} | price ${formatMoney(change.newPrice, currency)}`;
+      return `新增行库存: ${location} | 票数 ${change.newTicketCount} | 价格 ${formatMoney(change.newPrice, currency)}`;
     case 'stock_appeared':
-      return `Stock appeared: ${location} | 0 -> ${change.newTicketCount} | price ${formatMoney(change.newPrice, currency)}`;
+      return `行库存出现: ${location} | 0 -> ${change.newTicketCount} | 价格 ${formatMoney(change.newPrice, currency)}`;
     case 'stock_sold_out':
-      return `Sold out: ${location} | ${change.oldTicketCount} -> 0`;
+      return `行库存售罄: ${location} | ${change.oldTicketCount} -> 0`;
     case 'row_removed':
-      return `Row removed: ${location} | previous tickets ${change.oldTicketCount}`;
+      return `行已移除: ${location} | 原票数 ${change.oldTicketCount}`;
     case 'ticket_count_increased':
-      return `Ticket count increased: ${location} | ${change.oldTicketCount} -> ${change.newTicketCount}`;
+      return `行票数增加: ${location} | ${change.oldTicketCount} -> ${change.newTicketCount}`;
     case 'ticket_count_decreased':
-      return `Ticket count decreased: ${location} | ${change.oldTicketCount} -> ${change.newTicketCount}`;
+      return `行票数减少: ${location} | ${change.oldTicketCount} -> ${change.newTicketCount}`;
     case 'price_decreased':
-      return `Price decreased: ${location} | ${formatMoney(change.oldPrice, currency)} -> ${formatMoney(change.newPrice, currency)}`;
+      return `行价格下降: ${location} | ${formatMoney(change.oldPrice, currency)} -> ${formatMoney(change.newPrice, currency)}`;
     case 'price_increased':
-      return `Price increased: ${location} | ${formatMoney(change.oldPrice, currency)} -> ${formatMoney(change.newPrice, currency)}`;
+      return `行价格上涨: ${location} | ${formatMoney(change.oldPrice, currency)} -> ${formatMoney(change.newPrice, currency)}`;
     case 'new_listing_available':
-      return `New listing available: ${location} | tickets ${change.newTicketCount} | price ${formatMoney(change.newPrice, currency)}`;
+      return `新增挂单: ${location} | 票数 ${change.newTicketCount} | 价格 ${formatMoney(change.newPrice, currency)}`;
     case 'listing_removed':
-      return `Listing removed: ${location} | previous tickets ${change.oldTicketCount}`;
+      return `挂单移除: ${location} | 原票数 ${change.oldTicketCount}`;
     case 'listing_stock_appeared':
-      return `Listing stock appeared: ${location} | 0 -> ${change.newTicketCount} | price ${formatMoney(change.newPrice, currency)}`;
+      return `挂单库存出现: ${location} | 0 -> ${change.newTicketCount} | 价格 ${formatMoney(change.newPrice, currency)}`;
     case 'listing_sold_out':
-      return `Listing sold out: ${location} | ${change.oldTicketCount} -> 0`;
+      return `挂单售罄: ${location} | ${change.oldTicketCount} -> 0`;
     case 'listing_ticket_count_increased':
-      return `Listing ticket count increased: ${location} | ${change.oldTicketCount} -> ${change.newTicketCount}`;
+      return `挂单票数增加: ${location} | ${change.oldTicketCount} -> ${change.newTicketCount}`;
     case 'listing_ticket_count_decreased':
-      return `Listing ticket count decreased: ${location} | ${change.oldTicketCount} -> ${change.newTicketCount}`;
+      return `挂单票数减少: ${location} | ${change.oldTicketCount} -> ${change.newTicketCount}`;
     case 'listing_price_decreased':
-      return `Listing price decreased: ${location} | ${formatMoney(change.oldPrice, currency)} -> ${formatMoney(change.newPrice, currency)}`;
+      return `挂单价格下降: ${location} | ${formatMoney(change.oldPrice, currency)} -> ${formatMoney(change.newPrice, currency)}`;
     case 'listing_price_increased':
-      return `Listing price increased: ${location} | ${formatMoney(change.oldPrice, currency)} -> ${formatMoney(change.newPrice, currency)}`;
+      return `挂单价格上涨: ${location} | ${formatMoney(change.oldPrice, currency)} -> ${formatMoney(change.newPrice, currency)}`;
     default:
-      return `${change.type}: ${location}`;
+      return `变更(${change.type}): ${location}`;
   }
 }
 
@@ -95,34 +109,34 @@ function buildInventoryMessageText({ snapshot, diff, config }) {
   const overflowCount = Math.max(0, (diff.changes || []).length - visibleChanges.length);
   const currency = snapshot.summary.currency;
   const lines = [
-    `Viagogo Inventory Alert`,
-    `Event: ${snapshot.event.name || 'Unknown Event'}`,
+    'Viagogo 库存告警',
+    `事件: ${snapshot.event.name || '未知活动'}`,
   ];
 
   if (snapshot.event.date) {
-    lines.push(`Date: ${snapshot.event.date}`);
+    lines.push(`日期: ${snapshot.event.date}`);
   }
   if (snapshot.event.location) {
-    lines.push(`Location: ${snapshot.event.location}`);
+    lines.push(`地点: ${snapshot.event.location}`);
   }
 
-  lines.push(`Alertable changes: ${diff.changeCount}`);
-  lines.push(`Comparison mode: ${diff.comparisonMode || 'row'}`);
-  lines.push('Snapshot Summary:');
+  lines.push(`告警变更数: ${diff.changeCount}`);
+  lines.push(`对比模式: ${describeComparisonMode(diff.comparisonMode || 'row')}`);
+  lines.push('快照摘要:');
   lines.push(...buildSummaryField(snapshot, diff));
 
   if (visibleChanges.length > 0) {
-    lines.push('Top Inventory Changes:');
+    lines.push('主要库存变更:');
     visibleChanges.forEach((change, index) => {
       lines.push(`${index + 1}. ${describeChange(change, currency)}`);
     });
   }
 
   if (overflowCount > 0) {
-    lines.push(`...and ${overflowCount} more change(s).`);
+    lines.push(`...... 还有 ${overflowCount} 条变更`);
   }
 
-  lines.push(`Event URL: ${snapshot.eventUrl}`);
+  lines.push(`活动链接: ${snapshot.eventUrl}`);
 
   return truncate(lines.join('\n'), 3000);
 }

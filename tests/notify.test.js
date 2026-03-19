@@ -62,13 +62,13 @@ function buildPayload() {
 test('buildInventoryMessageText builds a grouped Feishu-friendly plain text message', () => {
   const text = buildInventoryMessageText(buildPayload());
 
-  assert.match(text, /Viagogo Inventory Alert/);
+  assert.match(text, /Viagogo 库存告警/);
   assert.match(text, /Artist Name - London/);
-  assert.match(text, /Alertable changes: 2/);
-  assert.match(text, /Comparison mode: listing/);
-  assert.match(text, /Total listings: 5 \(\+2\)/);
-  assert.match(text, /Top Inventory Changes:/);
-  assert.match(text, /New listing available: M15 \/ Row A \/ Seat 1-2 \/ Listing 9001/);
+  assert.match(text, /告警变更数: 2/);
+  assert.match(text, /对比模式: 挂单级/);
+  assert.match(text, /挂单总数: 5 \(\+2\)/);
+  assert.match(text, /主要库存变更:/);
+  assert.match(text, /新增挂单: M15 \/ 行 A \/ 座位 1-2 \/ 挂单 9001/);
 });
 
 test('buildFeishuMessagePayload wraps the text in the expected webhook contract', () => {
@@ -76,7 +76,7 @@ test('buildFeishuMessagePayload wraps the text in the expected webhook contract'
 
   assert.equal(payload.msg_type, 'text');
   assert.equal(typeof payload.content.text, 'string');
-  assert.match(payload.content.text, /Event URL:/);
+  assert.match(payload.content.text, /活动链接:/);
 });
 
 test('initializeFeishuNotifier returns null webhook when config is absent', () => {
