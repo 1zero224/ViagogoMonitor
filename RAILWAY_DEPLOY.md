@@ -224,6 +224,12 @@ where schemaname = 'public'
 xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" node index.js
 ```
 
+实际容器会先经过一个轻量 entrypoint 脚本，再执行上面的命令。这样做是为了在 Railway runtime logs 里尽早输出：
+
+- 容器是否真的开始执行用户进程
+- `xvfb-run` / `chromium` 是否存在
+- `SUPABASE_URL` / `SUPABASE_ANON_KEY` / `FEISHU_BOT_WEBHOOK_URL` / `EVENT_URLS` 是否已注入
+
 这样做的原因是：
 
 - Dockerfile 已经是唯一的运行时真相源
@@ -245,6 +251,7 @@ xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" node index.js
 4. 选择当前仓库
 5. 等待 Railway 读取仓库配置
 6. 确认服务设置中的 `Custom Start Command` 为空，避免覆盖 Dockerfile `CMD`
+7. 部署后优先查看 runtime logs，而不只是 build logs
 
 ### 5.4 首次部署建议
 

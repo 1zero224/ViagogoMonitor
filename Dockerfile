@@ -49,6 +49,9 @@ RUN npm ci --only=production && npm cache clean --force
 # Kopírovanie zdrojového kódu
 COPY . .
 
+# Normalizácia entrypoint skriptu pre Linux runtime aj pri Windows checkout-e
+RUN sed -i 's/\r$//' /app/docker-entrypoint.sh && chmod +x /app/docker-entrypoint.sh
+
 # Vytvorenie non-root usera pre bezpečnosť
 RUN groupadd -r botuser && useradd -r -g botuser -G audio,video botuser \
     && mkdir -p /home/botuser/Downloads \
@@ -58,5 +61,5 @@ RUN groupadd -r botuser && useradd -r -g botuser -G audio,video botuser \
 # Prepnutie na non-root usera
 USER botuser
 
-# Spustenie aplikácie s Xvfb (virtuálny displej pre headless browser)
-CMD ["xvfb-run", "--auto-servernum", "--server-args=-screen 0 1920x1080x24", "node", "index.js"]
+# Spustenie aplikácie cez explicitný entrypoint kvôli skorým runtime logom
+CMD ["/app/docker-entrypoint.sh"]
