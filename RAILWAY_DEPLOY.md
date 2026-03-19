@@ -214,20 +214,28 @@ where schemaname = 'public'
 [railway.json](./railway.json) 当前定义了：
 
 - 使用 Dockerfile 构建
-- 启动命令为：
+- restart policy
+
+实际启动命令建议直接使用 [Dockerfile](./Dockerfile) 里的 `CMD`，不要再在 Railway 控制台或 `railway.json` 里重复写一份 `Custom Start Command`。
+
+当前 Dockerfile 中的启动命令是：
 
 ```bash
 xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" node index.js
 ```
 
-这和 [Dockerfile](./Dockerfile) 里的浏览器运行方式保持一致，避免 Linux 下直接裸跑 `node index.js` 时缺少虚拟显示环境。
+这样做的原因是：
+
+- Dockerfile 已经是唯一的运行时真相源
+- 避免 Railway `Custom Start Command` 再覆盖一次镜像默认启动命令
+- 避免 shell / exec-form 参数解析差异导致的额外问题
 
 注意：
 
 - `xvfb-run` 不只依赖 `xvfb`
 - 还依赖镜像内存在 `xauth`
 - 如果缺少 `xauth`，进程会在 Node 启动前直接失败
-- 如果 `--server-args` 没有被引号包住，shell 可能把 `0` 误拆成待执行命令
+- 如果你手动填写 `Custom Start Command`，参数解析仍然可能和 Dockerfile `CMD` 不一致
 
 ### 5.3 新建 Railway 项目
 
@@ -236,6 +244,7 @@ xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" node index.js
 3. 选择 `Deploy from GitHub repo`
 4. 选择当前仓库
 5. 等待 Railway 读取仓库配置
+6. 确认服务设置中的 `Custom Start Command` 为空，避免覆盖 Dockerfile `CMD`
 
 ### 5.4 首次部署建议
 
@@ -551,9 +560,10 @@ limit 20;
 
 处理：
 
-1. 把 Railway 启动命令改成 `xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" node index.js`
-2. 重新触发 Railway build / deploy
-3. 确认启动日志里不再出现 `184: 0: not found`
+1. 清空 Railway 控制台里的 `Custom Start Command`
+2. 确认仓库中的 [Dockerfile](./Dockerfile) 保持当前 `CMD`
+3. 重新触发 Railway build / deploy
+4. 确认启动日志里不再出现 `184: 0: not found`
 
 ### 12.5 `Missing venueConfiguration or rowPopupData`
 

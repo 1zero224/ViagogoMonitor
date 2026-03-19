@@ -1,4 +1,9 @@
-const { parseBoolean, parseNumber, splitList } = require('./utils');
+const {
+  parseBoolean,
+  parseNumber,
+  splitList,
+  stripWrappingQuotes,
+} = require('./utils');
 
 function parseCliArgs(argv = []) {
   const urls = [];
@@ -10,28 +15,28 @@ function parseCliArgs(argv = []) {
     if (arg === '--url' || arg === '-u') {
       const nextValue = argv[index + 1];
       if (nextValue) {
-        urls.push(nextValue);
+        urls.push(stripWrappingQuotes(nextValue));
         index += 1;
       }
       continue;
     }
 
     if (arg.startsWith('--url=')) {
-      urls.push(...splitList(arg.slice('--url='.length)));
+      urls.push(...splitList(stripWrappingQuotes(arg.slice('--url='.length))));
       continue;
     }
 
     if (arg === '--mode') {
       const nextValue = argv[index + 1];
       if (nextValue) {
-        monitorMode = nextValue;
+        monitorMode = stripWrappingQuotes(nextValue);
         index += 1;
       }
       continue;
     }
 
     if (arg.startsWith('--mode=')) {
-      monitorMode = arg.slice('--mode='.length);
+      monitorMode = stripWrappingQuotes(arg.slice('--mode='.length));
     }
   }
 
@@ -45,13 +50,13 @@ function loadConfig(argv = []) {
   const cli = parseCliArgs(argv);
 
   return {
-    supabaseUrl: process.env.SUPABASE_URL || null,
-    supabaseAnonKey: process.env.SUPABASE_ANON_KEY || null,
-    feishuBotWebhookUrl: process.env.FEISHU_BOT_WEBHOOK_URL || process.env.FEISHU_WEBHOOK_URL || null,
-    artistFilter: process.env.ARTIST_FILTER || null,
-    countryFilter: process.env.COUNTRY_FILTER || null,
-    projectName: process.env.PROJECT_NAME || 'viagogo-monitor',
-    monitorMode: (cli.monitorMode || process.env.MONITOR_MODE || 'inventory').trim().toLowerCase(),
+    supabaseUrl: stripWrappingQuotes(process.env.SUPABASE_URL) || null,
+    supabaseAnonKey: stripWrappingQuotes(process.env.SUPABASE_ANON_KEY) || null,
+    feishuBotWebhookUrl: stripWrappingQuotes(process.env.FEISHU_BOT_WEBHOOK_URL || process.env.FEISHU_WEBHOOK_URL) || null,
+    artistFilter: stripWrappingQuotes(process.env.ARTIST_FILTER) || null,
+    countryFilter: stripWrappingQuotes(process.env.COUNTRY_FILTER) || null,
+    projectName: stripWrappingQuotes(process.env.PROJECT_NAME) || 'viagogo-monitor',
+    monitorMode: stripWrappingQuotes(cli.monitorMode || process.env.MONITOR_MODE || 'inventory').trim().toLowerCase(),
     eventUrls: [...new Set([...splitList(process.env.EVENT_URLS), ...cli.urls])],
     alertOnStockAppear: parseBoolean(process.env.ALERT_ON_STOCK_APPEAR, true),
     alertOnStockDrop: parseBoolean(process.env.ALERT_ON_STOCK_DROP, true),
@@ -67,12 +72,12 @@ function loadConfig(argv = []) {
     sectionMapTimeoutMs: Math.max(1000, parseNumber(process.env.SECTION_MAP_TIMEOUT_MS, 15000)),
     betweenTargetDelayMinMs: Math.max(0, parseNumber(process.env.BETWEEN_TARGET_DELAY_MIN_MS, 10000)),
     betweenTargetDelayMaxMs: Math.max(0, parseNumber(process.env.BETWEEN_TARGET_DELAY_MAX_MS, 20000)),
-    historyTable: process.env.INVENTORY_SNAPSHOTS_TABLE || 'vgg_inventory_snapshots',
-    diffTable: process.env.INVENTORY_DIFFS_TABLE || 'vgg_inventory_diffs',
+    historyTable: stripWrappingQuotes(process.env.INVENTORY_SNAPSHOTS_TABLE) || 'vgg_inventory_snapshots',
+    diffTable: stripWrappingQuotes(process.env.INVENTORY_DIFFS_TABLE) || 'vgg_inventory_diffs',
     writeCompatibilityCache: parseBoolean(process.env.WRITE_PREVIOUSPRICES_CACHE, true),
     persistDiffs: parseBoolean(process.env.PERSIST_DIFFS, false),
     dumpRawPayloadOnFailure: parseBoolean(process.env.DUMP_RAW_PAYLOAD_ON_FAILURE, false),
-    rawPayloadDumpDir: process.env.RAW_PAYLOAD_DUMP_DIR || 'debug-payloads',
+    rawPayloadDumpDir: stripWrappingQuotes(process.env.RAW_PAYLOAD_DUMP_DIR) || 'debug-payloads',
   };
 }
 

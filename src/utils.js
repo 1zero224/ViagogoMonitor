@@ -7,12 +7,31 @@ async function randomDelay(min = 500, max = 1500) {
   return new Promise((resolve) => setTimeout(resolve, duration));
 }
 
+function stripWrappingQuotes(value) {
+  if (value == null) {
+    return value;
+  }
+
+  const trimmed = String(value).trim();
+  if (trimmed.length < 2) {
+    return trimmed;
+  }
+
+  const first = trimmed[0];
+  const last = trimmed[trimmed.length - 1];
+  if ((first === '"' && last === '"') || (first === '\'' && last === '\'')) {
+    return trimmed.slice(1, -1).trim();
+  }
+
+  return trimmed;
+}
+
 function parseBoolean(value, defaultValue = false) {
   if (value == null || value === '') {
     return defaultValue;
   }
 
-  const normalized = String(value).trim().toLowerCase();
+  const normalized = stripWrappingQuotes(value).toLowerCase();
   if (['1', 'true', 'yes', 'y', 'on'].includes(normalized)) {
     return true;
   }
@@ -27,7 +46,7 @@ function parseNumber(value, defaultValue) {
     return defaultValue;
   }
 
-  const parsed = Number(value);
+  const parsed = Number(stripWrappingQuotes(value));
   return Number.isFinite(parsed) ? parsed : defaultValue;
 }
 
@@ -36,9 +55,9 @@ function splitList(value) {
     return [];
   }
 
-  return String(value)
+  return stripWrappingQuotes(value)
     .split(/[\r\n,;]+/)
-    .map((item) => item.trim())
+    .map((item) => stripWrappingQuotes(item))
     .filter(Boolean);
 }
 
@@ -122,6 +141,7 @@ module.exports = {
   parseNumber,
   randomDelay,
   splitList,
+  stripWrappingQuotes,
   toIsoDate,
   truncate,
 };
