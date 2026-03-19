@@ -1,0 +1,33 @@
+{
+  "name": "viagogo-price-monitor",
+  "version": "1.0.0",
+  "description": "Inventory snapshot monitor for Viagogo events with Supabase persistence and Feishu bot alerts",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "node --test"
+  },
+  "keywords": [
+    "viagogo",
+    "price-monitor",
+    "scraping",
+    "feishu"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "cheerio": "^1.2.0",
+    "dotenv": "^16.6.1",
+    "puppeteer": "^24.36.1",
+    "puppeteer-real-browser": "^1.4.4",
+    "undetected-browser": "^2.0.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

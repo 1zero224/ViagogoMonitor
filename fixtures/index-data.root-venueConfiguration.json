@@ -1,0 +1,31 @@
+{
+  "grid": {
+    "items": [
+      { "sectionId": 72001, "sectionMapName": "West Stand" },
+      { "sectionId": 72002, "sectionMapName": "North Stand" }
+    ]
+  },
+  "venueConfiguration": {
+    "entry-1": {
+      "sectionId": 72001,
+      "sectionName": "West Stand",
+      "ticketClassId": 901,
+      "rows": ["10", "11"]
+    },
+    "entry-2": {
+      "sectionId": 72002,
+      "sectionName": "North Stand",
+      "ticketClassId": 902,
+      "rows": ["1"]
+    }
+  },
+  "rowPopupData": {
+    "901_72001_10": {
+      "rawMinPrice": 180,
+      "formattedMinPrice": "€180.00",
+      "ticketCount": 3,
+      "listingCount": 2,
+      "currencyCode": "EUR"
+    }
+  }
+}

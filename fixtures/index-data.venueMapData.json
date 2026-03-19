@@ -1,0 +1,40 @@
+{
+  "grid": {
+    "items": [
+      { "sectionId": 61001, "sectionMapName": "A1" },
+      { "sectionId": 61002, "sectionMapName": "B2" }
+    ]
+  },
+  "venueMapData": {
+    "venueConfiguration": {
+      "entry-1": {
+        "sectionId": 61001,
+        "sectionName": "Floor East",
+        "ticketClassId": 515,
+        "rows": ["AA", "AB"]
+      },
+      "entry-2": {
+        "sectionId": 61002,
+        "sectionName": "Balcony",
+        "ticketClassId": 516,
+        "rows": ["7"]
+      }
+    },
+    "rowPopupData": {
+      "515_61001_AA": {
+        "rawMinPrice": 420,
+        "formattedMinPrice": "$420.00",
+        "ticketCount": 1,
+        "listingCount": 1,
+        "currencyCode": "USD"
+      },
+      "515_61001_AB": {
+        "rawMinPrice": 405,
+        "formattedMinPrice": "$405.00",
+        "ticketCount": 2,
+        "listingCount": 1,
+        "currencyCode": "USD"
+      }
+    }
+  }
+}

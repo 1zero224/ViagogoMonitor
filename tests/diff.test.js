@@ -1,0 +1,143 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+
+const { diffSnapshots, filterDiffForAlerts } = require('../src/diff');
+const { buildInventorySnapshot } = require('../src/normalize');
+
+function buildSnapshot(sections, capturedAt) {
+  return buildInventorySnapshot({
+    eventUrl: 'https://www.viagogo.com/Concert-Tickets/Rock/E-159436715?quantity=2',
+    eventId: '159436715',
+    capturedAt,
+    eventDetails: {
+      name: 'Artist Name - London',
+    },
+    sections,
+  });
+}
+
+test('diffSnapshots classifies row additions, removals, stock changes, ticket deltas, and price changes', () => {
+  const previous = buildSnapshot(
+    [
+      {
+        sectionId: 56342,
+        sectionMapName: 'M15',
+        sectionName: 'M15',
+        ticketClassId: 267,
+        rowId: 'A',
+        price: 239.22,
+        priceFormatted: '£239.22',
+        ticketCount: 2,
+        listingCount: 1,
+        rowPopupEntry: { currencyCode: 'GBP' },
+        dataNotFound: false,
+      },
+      {
+        sectionId: 56342,
+        sectionMapName: 'M15',
+        sectionName: 'M15',
+        ticketClassId: 267,
+        rowId: 'B',
+        price: 310.5,
+        priceFormatted: '£310.50',
+        ticketCount: 1,
+        listingCount: 1,
+        rowPopupEntry: { currencyCode: 'GBP' },
+        dataNotFound: false,
+      },
+      {
+        sectionId: 56343,
+        sectionMapName: 'M16',
+        sectionName: 'M16',
+        ticketClassId: 300,
+        rowId: '1',
+        price: null,
+        priceFormatted: null,
+        ticketCount: 0,
+        listingCount: 0,
+        rowPopupEntry: null,
+        dataNotFound: true,
+      },
+    ],
+    '2026-03-19T12:00:00.000Z',
+  );
+
+  const current = buildSnapshot(
+    [
+      {
+        sectionId: 56342,
+        sectionMapName: 'M15',
+        sectionName: 'M15',
+        ticketClassId: 267,
+        rowId: 'A',
+        price: 225,
+        priceFormatted: '£225.00',
+        ticketCount: 4,
+        listingCount: 2,
+        rowPopupEntry: { currencyCode: 'GBP' },
+        dataNotFound: false,
+      },
+      {
+        sectionId: 56343,
+        sectionMapName: 'M16',
+        sectionName: 'M16',
+        ticketClassId: 300,
+        rowId: '1',
+        price: 260,
+        priceFormatted: '£260.00',
+        ticketCount: 2,
+        listingCount: 1,
+        rowPopupEntry: { currencyCode: 'GBP' },
+        dataNotFound: false,
+      },
+      {
+        sectionId: 56344,
+        sectionMapName: 'M17',
+        sectionName: 'M17',
+        ticketClassId: 301,
+        rowId: 'C',
+        price: 199,
+        priceFormatted: '£199.00',
+        ticketCount: 3,
+        listingCount: 1,
+        rowPopupEntry: { currencyCode: 'GBP' },
+        dataNotFound: false,
+      },
+    ],
+    '2026-03-19T12:05:00.000Z',
+  );
+
+  const diff = diffSnapshots(previous, current, { minTicketDelta: 1 });
+  const changeTypes = diff.changes.map((change) => change.type);
+
+  assert.deepEqual(
+    changeTypes.sort(),
+    [
+      'new_row_available',
+      'price_decreased',
+      'row_removed',
+      'stock_appeared',
+      'ticket_count_increased',
+    ].sort(),
+  );
+});
+
+test('filterDiffForAlerts respects alert toggles', () => {
+  const diff = {
+    changes: [
+      { type: 'new_row_available' },
+      { type: 'ticket_count_decreased' },
+      { type: 'price_decreased' },
+    ],
+    changeCount: 3,
+  };
+
+  const filtered = filterDiffForAlerts(diff, {
+    alertOnStockAppear: true,
+    alertOnStockDrop: false,
+    alertOnPriceChange: false,
+  });
+
+  assert.equal(filtered.changeCount, 1);
+  assert.equal(filtered.changes[0].type, 'new_row_available');
+});

@@ -1,0 +1,40 @@
+{
+  "grid": {
+    "items": [
+      { "sectionId": 56342, "sectionMapName": "M15" },
+      { "sectionId": 56343, "sectionMapName": "M16" }
+    ],
+    "venueMapData": {
+      "venueConfiguration": {
+        "entry-1": {
+          "sectionId": 56342,
+          "sectionName": "Lower Bowl",
+          "ticketClassId": 267,
+          "rows": ["A", "B"]
+        },
+        "entry-2": {
+          "sectionId": 56343,
+          "sectionName": "Upper Bowl",
+          "ticketClassId": 300,
+          "rows": ["1"]
+        }
+      },
+      "rowPopupData": {
+        "267_56342_A": {
+          "rawMinPrice": 239.22,
+          "formattedMinPrice": "£239.22",
+          "ticketCount": 2,
+          "listingCount": 1,
+          "currencyCode": "GBP"
+        },
+        "300_56343_1": {
+          "rawMinPrice": 310.5,
+          "formattedMinPrice": "£310.50",
+          "ticketCount": 4,
+          "listingCount": 2,
+          "currencyCode": "GBP"
+        }
+      }
+    }
+  }
+}
