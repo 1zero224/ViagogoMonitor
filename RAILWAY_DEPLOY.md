@@ -96,6 +96,7 @@
 - `node:20-bullseye-slim`
 - Chromium
 - Xvfb
+- xauth
 - Linux 浏览器运行所需系统库
 
 ## 3. Supabase 侧准备
@@ -220,6 +221,12 @@ xvfb-run --auto-servernum --server-args=-screen 0 1920x1080x24 node index.js
 ```
 
 这和 [Dockerfile](./Dockerfile) 里的浏览器运行方式保持一致，避免 Linux 下直接裸跑 `node index.js` 时缺少虚拟显示环境。
+
+注意：
+
+- `xvfb-run` 不只依赖 `xvfb`
+- 还依赖镜像内存在 `xauth`
+- 如果缺少 `xauth`，进程会在 Node 启动前直接失败
 
 ### 5.3 新建 Railway 项目
 
@@ -495,7 +502,27 @@ limit 20;
 - 检查 `SUPABASE_URL`
 - 检查 `SUPABASE_ANON_KEY`
 
-### 12.2 `index-data intercept timeout`
+### 12.2 `xvfb-run: error: xauth command not found`
+
+含义：
+
+- Railway 已经成功启动容器
+- 但容器里的 `xvfb-run` 在启动 Node 之前就失败了
+- 根因通常是 Docker 镜像安装了 `xvfb`，但没有安装 `xauth`
+
+处理：
+
+1. 确认 [Dockerfile](./Dockerfile) 的系统依赖里包含 `xauth`
+2. 重新触发 Railway build，不要只重启旧容器
+3. 部署后再次检查启动日志，确认不再出现 `xauth command not found`
+
+如果你已经拉到了当前仓库的新版本，但 Railway 仍然报同样的错，优先检查：
+
+- 这次部署是否真的使用了最新 commit
+- Railway 是否确实走了 Dockerfile 重建
+- 项目里是否还有别的启动命令覆盖了当前配置
+
+### 12.3 `index-data intercept timeout`
 
 含义：
 
@@ -508,7 +535,7 @@ limit 20;
 3. 必要时调大 `JSON_INTERCEPT_TIMEOUT_MS`
 4. 必要时开启 `DUMP_RAW_PAYLOAD_ON_FAILURE=true`
 
-### 12.3 `Missing venueConfiguration or rowPopupData`
+### 12.4 `Missing venueConfiguration or rowPopupData`
 
 含义：
 
@@ -521,7 +548,7 @@ limit 20;
 3. 分析 dump 出来的 payload
 4. 再修 parser
 
-### 12.4 飞书告警发送失败
+### 12.5 飞书告警发送失败
 
 现象：
 
@@ -534,7 +561,7 @@ limit 20;
 - 检查 Webhook 是否仍然有效
 - 检查飞书群机器人是否被禁用
 
-### 12.5 历史快照写入失败
+### 12.6 历史快照写入失败
 
 现象：
 
@@ -546,7 +573,7 @@ limit 20;
 - 检查 `SUPABASE_ANON_KEY` 是否有对应表写权限
 - 检查 `vgg_inventory_snapshots` 是否已创建
 
-### 12.6 数据库模式下读不到目标
+### 12.7 数据库模式下读不到目标
 
 现象：
 

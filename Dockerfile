@@ -1,7 +1,8 @@
 FROM node:20-bullseye-slim
 
-# Inštalácia Chromium, Xvfb, procps a potrebných závislostí
+# Inštalácia Chromium, Xvfb, xauth, procps a potrebných závislostí
 # - xvfb: virtuálny framebuffer pre puppeteer-real-browser na Linuxe
+# - xauth: vyžaduje ho wrapper xvfb-run pri štarte
 # - procps: poskytuje príkaz "ps", ktorý knižnica potrebuje na správu procesov
 RUN apt-get update && apt-get install -y \
     chromium \
@@ -27,6 +28,7 @@ RUN apt-get update && apt-get install -y \
     xdg-utils \
     ca-certificates \
     xvfb \
+    xauth \
     procps \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
