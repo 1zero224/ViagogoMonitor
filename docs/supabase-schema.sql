@@ -36,3 +36,11 @@ create index if not exists idx_vgg_inventory_diffs_event_id_captured_at
 
 create index if not exists idx_vgg_inventory_diffs_snapshot_id
   on public.vgg_inventory_diffs (snapshot_id);
+
+grant usage on schema public to service_role;
+
+grant select, insert, update, delete on table public.vgg_inventory_snapshots to service_role;
+grant select, insert, update, delete on table public.vgg_inventory_diffs to service_role;
+
+grant usage, select on sequence public.vgg_inventory_snapshots_id_seq to service_role;
+grant usage, select on sequence public.vgg_inventory_diffs_id_seq to service_role;

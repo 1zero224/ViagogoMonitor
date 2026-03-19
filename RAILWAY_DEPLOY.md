@@ -130,6 +130,13 @@
 - `public.vgg_inventory_snapshots`
 - `public.vgg_inventory_diffs`
 - 相应索引
+- 针对这两个历史表的 `service_role` grant
+
+注意：
+
+- 当前 schema 只会给 monitor 自己的历史表补 `service_role` 权限
+- 不会自动修改你现有 `vgg_links` 的权限
+- 如果你后面切到数据库模式，`vgg_links` 仍然需要具备对应的 `select` / `update` 权限
 
 ### 3.3 建表后验证
 
