@@ -56,3 +56,17 @@ test('loadConfig strips wrapping quotes from Railway-style env values', () => {
     },
   );
 });
+
+test('loadConfig prefers SUPABASE_SERVICE_ROLE_KEY over SUPABASE_ANON_KEY', () => {
+  withEnv(
+    {
+      SUPABASE_URL: 'https://example.supabase.co',
+      SUPABASE_SERVICE_ROLE_KEY: '"service-role-key"',
+      SUPABASE_ANON_KEY: '"anon-key"',
+    },
+    () => {
+      const config = loadConfig([]);
+      assert.equal(config.supabaseAnonKey, 'service-role-key');
+    },
+  );
+});

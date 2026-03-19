@@ -54,10 +54,13 @@ tests/
 
 ```env
 SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
 FEISHU_BOT_WEBHOOK_URL=https://open.feishu.cn/open-apis/bot/v2/hook/your-webhook-token
 ```
+
+For server-side deployments such as Railway, `SUPABASE_SERVICE_ROLE_KEY` is recommended.
+`SUPABASE_ANON_KEY` is still supported as a fallback, but then your tables and policies must explicitly allow the required reads and writes.
 
 ## Optional Environment Variables
 

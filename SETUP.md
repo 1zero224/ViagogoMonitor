@@ -14,9 +14,12 @@ Minimum required configuration:
 
 ```env
 SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 FEISHU_BOT_WEBHOOK_URL=https://open.feishu.cn/open-apis/bot/v2/hook/your-webhook-token
 ```
+
+For Railway or any other trusted server-side runtime, prefer `SUPABASE_SERVICE_ROLE_KEY`.
+If you insist on `SUPABASE_ANON_KEY`, you must also configure table grants / RLS policies that allow this monitor to read and write its tables.
 
 Recommended inventory monitor configuration:
 

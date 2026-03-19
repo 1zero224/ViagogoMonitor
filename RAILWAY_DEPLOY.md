@@ -81,7 +81,7 @@
 部署前需要准备：
 
 - 一个可用的 Supabase 项目
-- 一个可写入目标表的 `SUPABASE_ANON_KEY`
+- 一个可写入目标表的 Supabase key
 - 一个可用的飞书群机器人 Webhook
 - 一个可访问 Viagogo 的 Railway 运行环境
 
@@ -281,9 +281,15 @@ docker-entrypoint.sh
 
 ```env
 SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 FEISHU_BOT_WEBHOOK_URL=https://open.feishu.cn/open-apis/bot/v2/hook/your-webhook-token
 ```
+
+说明：
+
+- Railway 这类服务端部署，优先使用 `SUPABASE_SERVICE_ROLE_KEY`
+- 代码会优先读取 `SUPABASE_SERVICE_ROLE_KEY`，如果没有再回退到 `SUPABASE_ANON_KEY`
+- 如果你坚持使用 `SUPABASE_ANON_KEY`，那它必须对相关表具备足够的读写权限
 
 ### 6.2 推荐默认值
 
@@ -522,7 +528,7 @@ limit 20;
 处理：
 
 - 检查 `SUPABASE_URL`
-- 检查 `SUPABASE_ANON_KEY`
+- 检查 `SUPABASE_SERVICE_ROLE_KEY` 或 `SUPABASE_ANON_KEY`
 
 ### 12.2 `xvfb-run: error: xauth command not found`
 
@@ -626,11 +632,27 @@ limit 20;
 
 处理：
 
-- 检查 Supabase RLS / policy
-- 检查 `SUPABASE_ANON_KEY` 是否有对应表写权限
+- Railway 上优先改用 `SUPABASE_SERVICE_ROLE_KEY`
+- 如果继续使用 `SUPABASE_ANON_KEY`，检查 Supabase grant / RLS / policy
 - 检查 `vgg_inventory_snapshots` 是否已创建
 
-### 12.9 数据库模式下读不到目标
+### 12.9 `permission denied for table vgg_inventory_snapshots`
+
+含义：
+
+- 应用已经成功抓到了 Viagogo 页面数据
+- 但当前 Supabase key 没有权限读取 `vgg_inventory_snapshots`
+
+最直接的处理方式：
+
+1. 在 Railway variables 中新增 `SUPABASE_SERVICE_ROLE_KEY`
+2. 值使用 Supabase 项目的 service role key
+3. 保留现有 `SUPABASE_URL`
+4. 重新 deploy
+
+如果你不想使用 service role key，再考虑为 `anon` 角色单独补 grant / policy。
+
+### 12.10 数据库模式下读不到目标
 
 现象：
 

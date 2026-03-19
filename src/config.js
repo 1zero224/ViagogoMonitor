@@ -51,7 +51,7 @@ function loadConfig(argv = []) {
 
   return {
     supabaseUrl: stripWrappingQuotes(process.env.SUPABASE_URL) || null,
-    supabaseAnonKey: stripWrappingQuotes(process.env.SUPABASE_ANON_KEY) || null,
+    supabaseAnonKey: stripWrappingQuotes(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY) || null,
     feishuBotWebhookUrl: stripWrappingQuotes(process.env.FEISHU_BOT_WEBHOOK_URL || process.env.FEISHU_WEBHOOK_URL) || null,
     artistFilter: stripWrappingQuotes(process.env.ARTIST_FILTER) || null,
     countryFilter: stripWrappingQuotes(process.env.COUNTRY_FILTER) || null,
@@ -87,7 +87,7 @@ function validateRuntimeConfig(config) {
     missing.push('SUPABASE_URL');
   }
   if (!config.supabaseAnonKey) {
-    missing.push('SUPABASE_ANON_KEY');
+    missing.push('SUPABASE_SERVICE_ROLE_KEY or SUPABASE_ANON_KEY');
   }
 
   if (missing.length > 0) {
