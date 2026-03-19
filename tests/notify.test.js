@@ -16,6 +16,7 @@ function buildPayload() {
       summary: {
         rowsWithStock: 3,
         sectionsWithStock: 2,
+        totalListingCount: 5,
         totalTicketCount: 8,
         minPrice: 199,
         currency: 'GBP',
@@ -23,24 +24,30 @@ function buildPayload() {
     },
     diff: {
       changeCount: 2,
+      comparisonMode: 'listing',
       summaryChanges: {
         rowsWithStockDelta: 1,
         sectionsWithStockDelta: 1,
+        totalListingCountDelta: 2,
         totalTicketCountDelta: 4,
         minPriceDelta: -20,
       },
       changes: [
         {
-          type: 'stock_appeared',
+          type: 'new_listing_available',
           sectionName: 'M15',
           rowId: 'A',
+          seat: '1-2',
+          listingId: '9001',
           newTicketCount: 2,
           newPrice: 199,
         },
         {
-          type: 'ticket_count_increased',
+          type: 'listing_ticket_count_increased',
           sectionName: 'M16',
           rowId: 'B',
+          seat: '3-4',
+          listingId: '9002',
           oldTicketCount: 2,
           newTicketCount: 6,
         },
@@ -58,8 +65,10 @@ test('buildInventoryMessageText builds a grouped Feishu-friendly plain text mess
   assert.match(text, /Viagogo Inventory Alert/);
   assert.match(text, /Artist Name - London/);
   assert.match(text, /Alertable changes: 2/);
+  assert.match(text, /Comparison mode: listing/);
+  assert.match(text, /Total listings: 5 \(\+2\)/);
   assert.match(text, /Top Inventory Changes:/);
-  assert.match(text, /Stock appeared: M15 \/ Row A/);
+  assert.match(text, /New listing available: M15 \/ Row A \/ Seat 1-2 \/ Listing 9001/);
 });
 
 test('buildFeishuMessagePayload wraps the text in the expected webhook contract', () => {

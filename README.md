@@ -4,11 +4,12 @@ Inventory snapshot monitor for user-specified Viagogo events.
 
 This repository keeps the working real-browser scraping path, but changes the business logic from "price drop only" to a snapshot + diff pipeline that can detect:
 
-- stock appearing after an empty state
-- stock selling out
-- ticket count increases and decreases
-- row additions and removals
+- new listings appearing
+- listings being removed
+- listing ticket count increases and decreases
 - optional price changes
+
+The runtime now monitors marketplace listings by `listingId` as the primary diff entity, while still keeping row and section rollups for summary and compatibility.
 
 The monitor persists each run to Supabase, keeps `vgg_links.previousprices` as a compatibility cache, and sends grouped Feishu bot alerts.
 
@@ -23,12 +24,13 @@ The main runtime flow is:
 
 1. open the Viagogo event page with `puppeteer-real-browser`
 2. intercept the HTML response and parse `<script id="index-data">`
-3. normalize inventory rows into a stable snapshot contract
-4. load the latest previous snapshot from `vgg_inventory_snapshots`
-5. fall back to `vgg_links.previousprices` when historical data is unavailable
-6. compute the inventory diff
-7. store the new snapshot and update the compatibility cache
-8. send grouped Feishu bot alerts for alertable changes
+3. load all listing pages by following the event page's `Show more` pagination JSON
+4. normalize inventory listings into a stable snapshot contract while preserving row/section rollups
+5. load the latest previous snapshot from `vgg_inventory_snapshots`
+6. fall back to `vgg_links.previousprices` when historical data is unavailable
+7. compute the inventory diff
+8. store the new snapshot and update the compatibility cache
+9. send grouped Feishu bot alerts for alertable changes
 
 ## Project Layout
 
@@ -134,6 +136,7 @@ Fixtures under [`fixtures/`](./fixtures/) are synthetic contract fixtures for th
 - if the JSON structure drifts, enable `DUMP_RAW_PAYLOAD_ON_FAILURE=true` to capture the payload for debugging
 - the historical snapshot insert can fail independently from the compatibility cache update; the logs call this out explicitly
 - Feishu bot alerts are sent only when a previous snapshot exists and the filtered diff is non-empty
+- the first deployment after switching from row-level history to listing-level history stores a new listing baseline and intentionally suppresses alerts for that run
 
 ## Deployment
 

@@ -18,6 +18,9 @@ const USER_AGENTS = [
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0',
 ];
+const LISTING_PROGRESS_TIMEOUT_MS = 12000;
+const LISTING_PROGRESS_POLL_MS = 500;
+const MAX_SHOW_MORE_CLICKS = 20;
 
 function getRandomUserAgent() {
   return USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
@@ -217,6 +220,132 @@ function getVenueMapSource(jsonData) {
   }
 
   return null;
+}
+
+function getEventRequestPath(url) {
+  try {
+    const parsed = new URL(url);
+    return parsed.pathname.replace(/\/+$/, '');
+  } catch (error) {
+    return String(url || '').split('?')[0].replace(/https?:\/\/[^/]+/i, '').replace(/\/+$/, '');
+  }
+}
+
+function isEventListingJsonResponse(responseUrl, targetUrl, contentType) {
+  if (!/application\/json/i.test(contentType || '')) {
+    return false;
+  }
+
+  return getEventRequestPath(responseUrl) === getEventRequestPath(targetUrl);
+}
+
+function extractListingItemsFromPayload(payload) {
+  if (!payload || !Array.isArray(payload.items)) {
+    return [];
+  }
+
+  return payload.items.filter((item) => item && (item.id != null || item.listingId != null));
+}
+
+function dedupeListingItems(items = []) {
+  const deduped = new Map();
+
+  for (const item of items || []) {
+    const listingId = item?.listingId ?? item?.id ?? null;
+    if (listingId == null) {
+      continue;
+    }
+
+    deduped.set(String(listingId), item);
+  }
+
+  return [...deduped.values()];
+}
+
+async function getListingProgress(page) {
+  return page.evaluate(() => {
+    const text = document.body.innerText || '';
+    const progressMatch = text.match(/Showing\s+(\d+)\s+of\s+(\d+)/i);
+    const totalMatch = text.match(/(\d+)\s+listings/i);
+    const hasShowMore = [...document.querySelectorAll('button, a, [role="button"]')]
+      .some((item) => /show more/i.test((item.innerText || item.textContent || '').trim()));
+
+    return {
+      shownCount: progressMatch ? Number(progressMatch[1]) : null,
+      totalCount: progressMatch ? Number(progressMatch[2]) : (totalMatch ? Number(totalMatch[1]) : null),
+      hasShowMore,
+    };
+  });
+}
+
+async function clickShowMore(page) {
+  return page.evaluate(() => {
+    const nodes = [...document.querySelectorAll('button, a, [role="button"]')];
+    const button = nodes.find((item) => /show more/i.test((item.innerText || item.textContent || '').trim()));
+    if (!button) {
+      return false;
+    }
+
+    button.click();
+    return true;
+  });
+}
+
+async function waitForListingProgressUpdate(page, listingBatchState, previousProgress, previousBatchCount) {
+  const startedAt = Date.now();
+
+  while (Date.now() - startedAt < LISTING_PROGRESS_TIMEOUT_MS) {
+    const progress = await getListingProgress(page);
+    if (listingBatchState.batches.length > previousBatchCount) {
+      return progress;
+    }
+    if (
+      progress.shownCount != null &&
+      previousProgress.shownCount != null &&
+      progress.shownCount > previousProgress.shownCount
+    ) {
+      return progress;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, LISTING_PROGRESS_POLL_MS));
+  }
+
+  return getListingProgress(page);
+}
+
+async function collectAllListingItems(page, target, initialJson, listingBatchState) {
+  const source = getVenueMapSource(initialJson);
+  const initialItems = dedupeListingItems(source?.gridItems || []);
+  let progress = await getListingProgress(page);
+  let clickCount = 0;
+
+  while (
+    progress.hasShowMore &&
+    progress.shownCount != null &&
+    progress.totalCount != null &&
+    progress.shownCount < progress.totalCount &&
+    clickCount < MAX_SHOW_MORE_CLICKS
+  ) {
+    const previousBatchCount = listingBatchState.batches.length;
+    const clicked = await clickShowMore(page);
+    if (!clicked) {
+      break;
+    }
+
+    clickCount += 1;
+    progress = await waitForListingProgressUpdate(page, listingBatchState, progress, previousBatchCount);
+  }
+
+  const finalProgress = await getListingProgress(page);
+  const extraItems = dedupeListingItems(listingBatchState.batches.flatMap((batch) => batch.items));
+  const listingItems = dedupeListingItems([...initialItems, ...extraItems]);
+
+  return {
+    listingItems,
+    progress: finalProgress,
+    clickCount,
+    batchCount: listingBatchState.batches.length,
+  };
 }
 
 async function extractAllSectionsFromJSON(jsonData, sectionIdToMapNameFromSvg = {}) {
@@ -468,6 +597,11 @@ async function dumpRawPayload(config, target, runId, payload, suffix = 'parse-fa
 async function scrapeEventTarget(target, config, runId) {
   let browser = null;
   let interceptedJsonData = null;
+  const listingBatchState = {
+    batches: [],
+    seenPages: new Set(),
+    seenSignatures: new Set(),
+  };
   let resolveJsonData;
   const jsonDataPromise = new Promise((resolve) => {
     resolveJsonData = resolve;
@@ -517,15 +651,36 @@ async function scrapeEventTarget(target, config, runId) {
       const responseUrl = response.url();
       const contentType = response.headers()['content-type'] || '';
 
-      if (interceptedJsonData) {
-        return;
-      }
-
-      if (!contentType.includes('text/html') || !/\/E-\d+(?:$|[?#])/.test(responseUrl)) {
-        return;
-      }
-
       try {
+        if (isEventListingJsonResponse(responseUrl, target.url, contentType)) {
+          const payload = JSON.parse(await response.text());
+          const items = extractListingItemsFromPayload(payload);
+          if (items.length > 0) {
+            const pageNumber = payload.currentPage ?? null;
+            const signature = `${pageNumber ?? 'unknown'}:${items[0]?.id ?? items[0]?.listingId ?? 'empty'}:${items.length}`;
+            if (!listingBatchState.seenPages.has(pageNumber) && !listingBatchState.seenSignatures.has(signature)) {
+              if (pageNumber != null) {
+                listingBatchState.seenPages.add(pageNumber);
+              }
+              listingBatchState.seenSignatures.add(signature);
+              listingBatchState.batches.push({
+                currentPage: pageNumber,
+                totalCount: payload.totalCount ?? null,
+                items,
+              });
+            }
+          }
+          return;
+        }
+
+        if (interceptedJsonData) {
+          return;
+        }
+
+        if (!contentType.includes('text/html') || !/\/E-\d+(?:$|[?#])/.test(responseUrl)) {
+          return;
+        }
+
         const html = await response.text();
         const $ = cheerio.load(html);
         const scriptContent = $('#index-data').html();
@@ -577,6 +732,11 @@ async function scrapeEventTarget(target, config, runId) {
       throw new Error('No sections extracted from JSON payload');
     }
 
+    const listingCollection = await collectAllListingItems(page, target, interceptedJsonData, listingBatchState);
+    console.log(
+      `🧾 Listing pages loaded: initial=${getVenueMapSource(interceptedJsonData)?.gridItems?.length || 0}, extraPages=${listingCollection.batchCount}, totalListings=${listingCollection.listingItems.length}`,
+    );
+
     const pageDetails = await extractPageDetails(page);
     const eventDetails = mergeEventDetails(target, pageDetails);
     const eventId = target.eventId || buildEventIdFromUrl(target.url);
@@ -588,15 +748,21 @@ async function scrapeEventTarget(target, config, runId) {
       eventUrl: target.url,
       eventDetails,
       sections,
+      listingItems: listingCollection.listingItems,
       capturedAt,
       meta: {
         mapSectionCount: Object.keys(mapNames).length,
         rawSectionRecordCount: sections.length,
+        listingBatchCount: listingCollection.batchCount,
+        listingShowMoreClicks: listingCollection.clickCount,
+        listingProgress: listingCollection.progress,
         runId,
       },
     });
 
-    console.log(`📦 Snapshot built: rows=${snapshot.summary.rowsTracked}, rowsWithStock=${snapshot.summary.rowsWithStock}, totalTickets=${snapshot.summary.totalTicketCount}`);
+    console.log(
+      `📦 Snapshot built: rows=${snapshot.summary.rowsTracked}, rowsWithStock=${snapshot.summary.rowsWithStock}, totalListings=${snapshot.summary.totalListingCount}, totalTickets=${snapshot.summary.totalTicketCount}`,
+    );
 
     return {
       success: true,

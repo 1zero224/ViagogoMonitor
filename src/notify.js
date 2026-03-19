@@ -32,13 +32,25 @@ function buildSummaryField(snapshot, diff) {
   return [
     `Rows with stock: ${snapshot.summary.rowsWithStock} (${formatSignedNumber(diff.summaryChanges.rowsWithStockDelta)})`,
     `Sections with stock: ${snapshot.summary.sectionsWithStock} (${formatSignedNumber(diff.summaryChanges.sectionsWithStockDelta)})`,
+    `Total listings: ${snapshot.summary.totalListingCount} (${formatSignedNumber(diff.summaryChanges.totalListingCountDelta)})`,
     `Total tickets: ${snapshot.summary.totalTicketCount} (${formatSignedNumber(diff.summaryChanges.totalTicketCountDelta)})`,
     minPriceLine,
   ];
 }
 
 function describeChange(change, currency) {
-  const location = `${change.sectionName}${change.rowId ? ` / Row ${change.rowId}` : ''}`;
+  const locationParts = [change.sectionName];
+  if (change.rowId) {
+    locationParts.push(`Row ${change.rowId}`);
+  }
+  if (change.seat) {
+    locationParts.push(`Seat ${change.seat}`);
+  }
+  if (change.listingId) {
+    locationParts.push(`Listing ${change.listingId}`);
+  }
+
+  const location = locationParts.filter(Boolean).join(' / ');
 
   switch (change.type) {
     case 'new_row_available':
@@ -57,6 +69,22 @@ function describeChange(change, currency) {
       return `Price decreased: ${location} | ${formatMoney(change.oldPrice, currency)} -> ${formatMoney(change.newPrice, currency)}`;
     case 'price_increased':
       return `Price increased: ${location} | ${formatMoney(change.oldPrice, currency)} -> ${formatMoney(change.newPrice, currency)}`;
+    case 'new_listing_available':
+      return `New listing available: ${location} | tickets ${change.newTicketCount} | price ${formatMoney(change.newPrice, currency)}`;
+    case 'listing_removed':
+      return `Listing removed: ${location} | previous tickets ${change.oldTicketCount}`;
+    case 'listing_stock_appeared':
+      return `Listing stock appeared: ${location} | 0 -> ${change.newTicketCount} | price ${formatMoney(change.newPrice, currency)}`;
+    case 'listing_sold_out':
+      return `Listing sold out: ${location} | ${change.oldTicketCount} -> 0`;
+    case 'listing_ticket_count_increased':
+      return `Listing ticket count increased: ${location} | ${change.oldTicketCount} -> ${change.newTicketCount}`;
+    case 'listing_ticket_count_decreased':
+      return `Listing ticket count decreased: ${location} | ${change.oldTicketCount} -> ${change.newTicketCount}`;
+    case 'listing_price_decreased':
+      return `Listing price decreased: ${location} | ${formatMoney(change.oldPrice, currency)} -> ${formatMoney(change.newPrice, currency)}`;
+    case 'listing_price_increased':
+      return `Listing price increased: ${location} | ${formatMoney(change.oldPrice, currency)} -> ${formatMoney(change.newPrice, currency)}`;
     default:
       return `${change.type}: ${location}`;
   }
@@ -79,6 +107,7 @@ function buildInventoryMessageText({ snapshot, diff, config }) {
   }
 
   lines.push(`Alertable changes: ${diff.changeCount}`);
+  lines.push(`Comparison mode: ${diff.comparisonMode || 'row'}`);
   lines.push('Snapshot Summary:');
   lines.push(...buildSummaryField(snapshot, diff));
 

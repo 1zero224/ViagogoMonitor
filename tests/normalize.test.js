@@ -54,15 +54,48 @@ test('buildInventorySnapshot computes summary metrics from normalized sections',
         dataNotFound: false,
       },
     ],
+    listingItems: [
+      {
+        id: 9001,
+        sectionId: 56342,
+        sectionMapName: 'M15',
+        row: 'A',
+        rowId: 'A',
+        seat: '1-2',
+        ticketClass: 267,
+        ticketClassName: 'Lower Bowl',
+        availableTickets: 2,
+        rawPrice: 239.22,
+        price: '£239.22',
+        buyerCurrencyCode: 'GBP',
+      },
+      {
+        id: 9002,
+        sectionId: 56343,
+        sectionMapName: 'M16',
+        row: '1',
+        rowId: '1',
+        seat: '5-8',
+        ticketClass: 300,
+        ticketClassName: 'Upper Bowl',
+        availableTickets: 4,
+        rawPrice: 310.5,
+        price: '£310.50',
+        buyerCurrencyCode: 'GBP',
+      },
+    ],
   });
 
   assert.equal(snapshot.summary.rowsTracked, 3);
   assert.equal(snapshot.summary.rowsWithStock, 2);
   assert.equal(snapshot.summary.sectionsTracked, 2);
   assert.equal(snapshot.summary.sectionsWithStock, 2);
+  assert.equal(snapshot.summary.totalListingCount, 2);
   assert.equal(snapshot.summary.totalTicketCount, 6);
   assert.equal(snapshot.summary.minPrice, 239.22);
   assert.equal(snapshot.summary.currency, 'GBP');
+  assert.equal(snapshot.meta.comparisonEntity, 'listing');
+  assert.equal(snapshot.listings['9001'].availableTickets, 2);
 });
 
 test('buildCompatibilitySnapshot rebuilds a previous snapshot from previousprices cache', () => {
@@ -80,6 +113,8 @@ test('buildCompatibilitySnapshot rebuilds a previous snapshot from previousprice
   });
 
   assert.equal(snapshot.summary.rowsTracked, 1);
+  assert.equal(snapshot.summary.totalListingCount, 1);
   assert.equal(snapshot.rows['267_56342_A'].ticketCount, 2);
   assert.equal(snapshot.rows['267_56342_A'].sectionName, 'M15');
+  assert.equal(snapshot.meta.comparisonEntity, 'row');
 });

@@ -84,7 +84,9 @@ async function processTarget({ target, supabase, feishuWebhookUrl, config, runId
   }
 
   let alertSent = false;
-  if (previousSnapshot && alertDiff.changeCount > 0) {
+  if (previousSnapshot && diff.baselineReset) {
+    console.log('ℹ️ Previous snapshot lacks listing-level data, current snapshot stored as new listing baseline without alert.');
+  } else if (previousSnapshot && alertDiff.changeCount > 0) {
     try {
       alertSent = await sendInventoryNotification(feishuWebhookUrl, {
         snapshot,

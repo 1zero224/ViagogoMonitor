@@ -22,15 +22,28 @@ Each successful scrape produces a normalized snapshot with:
 - `summary`
 - `sections`
 - `rows`
+- `listings`
 - `meta`
 
-The important contract decision is that `rows` are keyed by a stable row key:
+The important contract decision is that listing-level monitoring now uses a stable listing key:
+
+```text
+<listingId>
+```
+
+Row aggregates are still kept for summary and compatibility. They remain keyed by:
 
 ```text
 <ticketClassId>_<sectionId>_<rowId>
 ```
 
-This lets the diff engine compare rows without depending on display order.
+This lets the diff engine compare individual marketplace listings without depending on display order, while preserving row/section rollups.
+
+`summary` intentionally separates three marketplace layers so logs and alerts do not mix them:
+
+- `rowsWithStock`: normalized row keys with stock
+- `totalListingCount`: active marketplace listings
+- `totalTicketCount`: aggregate tickets across those listings
 
 ## Parser Branches
 
@@ -48,6 +61,8 @@ Row-level inventory resolution now follows this order:
 3. aggregated listing rows from `grid.items`
 
 The parser only emits explicit zero-stock rows when the venue configuration lists a row and none of those sources can resolve inventory for it.
+
+For listing-level monitoring, the scraper also clicks `Show more` until the page reaches `Showing N of N`, and collects the paginated JSON listing batches returned by the event endpoint itself.
 
 ## Previous Snapshot Resolution
 
@@ -70,6 +85,12 @@ The diff engine classifies:
 - `price_increased`
 - `new_row_available`
 - `row_removed`
+- `new_listing_available`
+- `listing_removed`
+- `listing_ticket_count_increased`
+- `listing_ticket_count_decreased`
+- `listing_price_decreased`
+- `listing_price_increased`
 
 Alert filters are applied after diff generation so the stored diff can remain complete.
 
