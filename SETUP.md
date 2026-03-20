@@ -30,7 +30,11 @@ ALERT_ON_STOCK_DROP=true
 ALERT_ON_PRICE_CHANGE=false
 MIN_TICKET_DELTA=1
 MAX_DIFF_ITEMS_IN_ALERT=10
+FEISHU_SECTION_FILTERS=[{"eventUrl":"https://www.viagogo.com/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465?quantity=1","sections":["B","N","G"]}]
 ```
+
+`FEISHU_SECTION_FILTERS` is optional and only limits Feishu delivery for matching events.
+Example above means the ZUTOMAYO event only sends Feishu alerts for sections `B`, `N`, and `G`.
 
 Direct URL mode example:
 

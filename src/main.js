@@ -2,7 +2,11 @@ const { loadConfig, validateRuntimeConfig } = require('./config');
 const { buildAlertDiff } = require('./alerting');
 const { diffSnapshots, filterDiffForAlerts } = require('./diff');
 const { buildCompatibilitySnapshot } = require('./normalize');
-const { initializeFeishuNotifier, sendInventoryNotification } = require('./notify');
+const {
+  filterDiffForFeishuSections,
+  initializeFeishuNotifier,
+  sendInventoryNotification,
+} = require('./notify');
 const { scrapeEventTarget } = require('./scraper');
 const {
   createSupabaseClient,
@@ -64,11 +68,17 @@ async function processTarget({ target, supabase, feishuWebhookUrl, config, runId
     previousSnapshots: historicalSnapshots,
     config,
   });
-  const alertDiff = filterDiffForAlerts(debouncedDiff, config);
+  const baseAlertDiff = filterDiffForAlerts(debouncedDiff, config);
+  const alertDiff = filterDiffForFeishuSections({
+    snapshot,
+    diff: baseAlertDiff,
+    config,
+  });
   snapshot.meta.alerting = {
     rawDiffChangeCount: diff.changeCount,
     finalAlertChangeCount: alertDiff.changeCount,
     debounce: debouncedDiff.debounce,
+    sectionFilter: alertDiff.sectionFilter,
   };
 
   if (debouncedDiff.debounce?.enabled) {
@@ -78,6 +88,11 @@ async function processTarget({ target, supabase, feishuWebhookUrl, config, runId
     if (debouncedDiff.debounce.insufficientHistory && debouncedDiff.debounce.suppressedRawAvailabilityChangeCount > 0) {
       console.log('   ℹ️ Insufficient snapshot history for confirmed listing add/remove alerts; raw availability changes suppressed.');
     }
+  }
+  if (alertDiff.sectionFilter?.enabled) {
+    console.log(
+      `ℹ️ Feishu section filter matched ${alertDiff.sectionFilter.matchedBy}: sections=${alertDiff.sectionFilter.allowedSections.join(', ')}, kept=${alertDiff.sectionFilter.remainingChangeCount}, filteredOut=${alertDiff.sectionFilter.filteredOutChangeCount}`,
+    );
   }
 
   const snapshotInsert = await insertInventorySnapshot(supabase, config, snapshot, target);
@@ -154,6 +169,9 @@ async function main(argv = []) {
   console.log(`🎯 Mode: ${config.monitorMode}`);
   console.log(`🔐 Supabase credential: ${config.supabaseCredentialSource || 'missing'}`);
   console.log(`🎯 Filters: Artist="${config.artistFilter || 'ALL'}", Country="${config.countryFilter || 'ALL'}"`);
+  if (config.feishuSectionFilters.length > 0) {
+    console.log(`🔔 Feishu section filters: ${config.feishuSectionFilters.length} rule(s)`);
+  }
   if (config.eventUrls.length > 0) {
     console.log(`🔗 Direct event mode: ${config.eventUrls.length} URL(s) from CLI/env`);
   }

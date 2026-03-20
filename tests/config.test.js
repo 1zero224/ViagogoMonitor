@@ -76,3 +76,40 @@ test('loadConfig prefers SUPABASE_SERVICE_ROLE_KEY over SUPABASE_ANON_KEY', () =
     },
   );
 });
+
+test('loadConfig parses FEISHU_SECTION_FILTERS as event-specific section rules', () => {
+  withEnv(
+    {
+      FEISHU_SECTION_FILTERS: JSON.stringify([
+        {
+          eventUrl: 'https://www.viagogo.com/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465?quantity=1',
+          sections: ['B', 'N', 'G'],
+        },
+      ]),
+    },
+    () => {
+      const config = loadConfig([]);
+      assert.deepEqual(config.feishuSectionFilters, [
+        {
+          eventUrl: 'https://www.viagogo.com/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465?quantity=1',
+          eventId: '159991465',
+          sections: ['B', 'N', 'G'],
+        },
+      ]);
+    },
+  );
+});
+
+test('loadConfig throws on malformed FEISHU_SECTION_FILTERS', () => {
+  withEnv(
+    {
+      FEISHU_SECTION_FILTERS: '{"bad":true}',
+    },
+    () => {
+      assert.throws(
+        () => loadConfig([]),
+        /FEISHU_SECTION_FILTERS must be a JSON array/,
+      );
+    },
+  );
+});

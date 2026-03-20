@@ -1,4 +1,10 @@
-const { formatMoney, formatSignedNumber, truncate } = require('./utils');
+const {
+  buildEventIdFromUrl,
+  formatMoney,
+  formatSignedNumber,
+  normalizeWhitespace,
+  truncate,
+} = require('./utils');
 
 function initializeFeishuNotifier(config) {
   if (!config.feishuBotWebhookUrl) {
@@ -16,6 +22,75 @@ function initializeFeishuNotifier(config) {
   console.log('✅ Feishu webhook configured');
   return {
     webhookUrl: config.feishuBotWebhookUrl,
+  };
+}
+
+function normalizeSectionFilterName(value) {
+  const normalized = normalizeWhitespace(value);
+  return normalized ? normalized.toUpperCase() : null;
+}
+
+function findMatchingFeishuSectionFilter(snapshot, config = {}) {
+  const rules = config.feishuSectionFilters || [];
+  if (!rules.length) {
+    return { rule: null, matchedBy: null };
+  }
+
+  const snapshotEventUrl = normalizeWhitespace(snapshot?.eventUrl);
+  const snapshotEventId = normalizeWhitespace(snapshot?.eventId || buildEventIdFromUrl(snapshot?.eventUrl));
+
+  for (const rule of rules) {
+    const ruleEventUrl = normalizeWhitespace(rule.eventUrl);
+    const ruleEventId = normalizeWhitespace(rule.eventId);
+
+    if (snapshotEventId && ruleEventId && snapshotEventId === ruleEventId) {
+      return { rule, matchedBy: 'event_id' };
+    }
+    if (snapshotEventUrl && ruleEventUrl && snapshotEventUrl === ruleEventUrl) {
+      return { rule, matchedBy: 'event_url' };
+    }
+  }
+
+  return { rule: null, matchedBy: null };
+}
+
+function filterDiffForFeishuSections({ snapshot, diff, config = {} }) {
+  const changes = diff?.changes || [];
+  const { rule, matchedBy } = findMatchingFeishuSectionFilter(snapshot, config);
+
+  if (!rule) {
+    return {
+      ...diff,
+      sectionFilter: {
+        enabled: false,
+        configuredRuleCount: (config.feishuSectionFilters || []).length,
+        filteredOutChangeCount: 0,
+        remainingChangeCount: changes.length,
+        allowedSections: [],
+      },
+    };
+  }
+
+  const allowedSections = [...new Set((rule.sections || []).map(normalizeSectionFilterName).filter(Boolean))];
+  const allowedSectionSet = new Set(allowedSections);
+  const filteredChanges = changes.filter((change) => {
+    const sectionName = normalizeSectionFilterName(change?.sectionName);
+    return sectionName && allowedSectionSet.has(sectionName);
+  });
+
+  return {
+    ...diff,
+    changes: filteredChanges,
+    changeCount: filteredChanges.length,
+    sectionFilter: {
+      enabled: true,
+      matchedBy,
+      eventId: rule.eventId || buildEventIdFromUrl(rule.eventUrl) || null,
+      eventUrl: rule.eventUrl || null,
+      allowedSections,
+      filteredOutChangeCount: changes.length - filteredChanges.length,
+      remainingChangeCount: filteredChanges.length,
+    },
   };
 }
 
@@ -63,14 +138,37 @@ function describeComparisonMode(mode) {
   return mode || '未知';
 }
 
-function describeChange(change, currency) {
+function appendEventLink(text, change, eventUrl) {
+  const shouldAppendLink = [
+    'new_row_available',
+    'stock_appeared',
+    'new_listing_available',
+    'listing_stock_appeared',
+  ].includes(change.type);
+
+  if (!shouldAppendLink || !eventUrl) {
+    return text;
+  }
+
+  return `${text} | 链接 ${eventUrl}`;
+}
+
+function describeChange(change, currency, eventUrl) {
   const location = formatLocation(change);
 
   switch (change.type) {
     case 'new_row_available':
-      return `新增行库存: ${location} | 票数 ${change.newTicketCount} | 价格 ${formatMoney(change.newPrice, currency)}`;
+      return appendEventLink(
+        `新增行库存: ${location} | 票数 ${change.newTicketCount} | 价格 ${formatMoney(change.newPrice, currency)}`,
+        change,
+        eventUrl,
+      );
     case 'stock_appeared':
-      return `行库存出现: ${location} | 0 -> ${change.newTicketCount} | 价格 ${formatMoney(change.newPrice, currency)}`;
+      return appendEventLink(
+        `行库存出现: ${location} | 0 -> ${change.newTicketCount} | 价格 ${formatMoney(change.newPrice, currency)}`,
+        change,
+        eventUrl,
+      );
     case 'stock_sold_out':
       return `行库存售罄: ${location} | ${change.oldTicketCount} -> 0`;
     case 'row_removed':
@@ -84,11 +182,19 @@ function describeChange(change, currency) {
     case 'price_increased':
       return `行价格上涨: ${location} | ${formatMoney(change.oldPrice, currency)} -> ${formatMoney(change.newPrice, currency)}`;
     case 'new_listing_available':
-      return `新增挂单: ${location} | 票数 ${change.newTicketCount} | 价格 ${formatMoney(change.newPrice, currency)}`;
+      return appendEventLink(
+        `新增挂单: ${location} | 票数 ${change.newTicketCount} | 价格 ${formatMoney(change.newPrice, currency)}`,
+        change,
+        eventUrl,
+      );
     case 'listing_removed':
       return `挂单移除: ${location} | 原票数 ${change.oldTicketCount}`;
     case 'listing_stock_appeared':
-      return `挂单库存出现: ${location} | 0 -> ${change.newTicketCount} | 价格 ${formatMoney(change.newPrice, currency)}`;
+      return appendEventLink(
+        `挂单库存出现: ${location} | 0 -> ${change.newTicketCount} | 价格 ${formatMoney(change.newPrice, currency)}`,
+        change,
+        eventUrl,
+      );
     case 'listing_sold_out':
       return `挂单售罄: ${location} | ${change.oldTicketCount} -> 0`;
     case 'listing_ticket_count_increased':
@@ -122,13 +228,16 @@ function buildInventoryMessageText({ snapshot, diff, config }) {
 
   lines.push(`告警变更数: ${diff.changeCount}`);
   lines.push(`对比模式: ${describeComparisonMode(diff.comparisonMode || 'row')}`);
+  if (diff.sectionFilter?.enabled && diff.sectionFilter.allowedSections.length > 0) {
+    lines.push(`分区过滤: ${diff.sectionFilter.allowedSections.join(', ')}`);
+  }
   lines.push('快照摘要:');
   lines.push(...buildSummaryField(snapshot, diff));
 
   if (visibleChanges.length > 0) {
     lines.push('主要库存变更:');
     visibleChanges.forEach((change, index) => {
-      lines.push(`${index + 1}. ${describeChange(change, currency)}`);
+      lines.push(`${index + 1}. ${describeChange(change, currency, snapshot.eventUrl)}`);
     });
   }
 
@@ -188,6 +297,7 @@ async function sendInventoryNotification(feishuWebhookUrl, payload) {
 module.exports = {
   buildFeishuMessagePayload,
   buildInventoryMessageText,
+  filterDiffForFeishuSections,
   initializeFeishuNotifier,
   sendInventoryNotification,
 };

@@ -77,6 +77,7 @@ ALERT_ON_STOCK_DROP=true
 ALERT_ON_PRICE_CHANGE=false
 MIN_TICKET_DELTA=1
 MAX_DIFF_ITEMS_IN_ALERT=10
+FEISHU_SECTION_FILTERS=[{"eventUrl":"https://www.viagogo.com/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465?quantity=1","sections":["B","N","G"]}]
 
 NAVIGATION_TIMEOUT_MS=80000
 JSON_INTERCEPT_TIMEOUT_MS=15000
@@ -145,6 +146,7 @@ Fixtures under [`fixtures/`](./fixtures/) are synthetic contract fixtures for th
 - if the JSON structure drifts, enable `DUMP_RAW_PAYLOAD_ON_FAILURE=true` to capture the payload for debugging
 - the historical snapshot insert can fail independently from the compatibility cache update; the logs call this out explicitly
 - Feishu bot alerts are sent only when a previous snapshot exists and the filtered diff is non-empty
+- `FEISHU_SECTION_FILTERS` only affects Feishu delivery; raw snapshots and raw diffs remain unchanged for SQL/debug inspection
 - the first deployment after switching from row-level history to listing-level history stores a new listing baseline and intentionally suppresses alerts for that run
 
 ## Deployment

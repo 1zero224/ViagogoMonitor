@@ -1,4 +1,5 @@
 const {
+  buildEventIdFromUrl,
   parseBoolean,
   parseNumber,
   splitList,
@@ -46,6 +47,52 @@ function parseCliArgs(argv = []) {
   };
 }
 
+function normalizeFeishuSectionFilterRule(rule, index) {
+  if (!rule || typeof rule !== 'object' || Array.isArray(rule)) {
+    throw new Error(`FEISHU_SECTION_FILTERS[${index}] must be an object.`);
+  }
+
+  const eventUrl = stripWrappingQuotes(rule.eventUrl) || null;
+  const eventId = stripWrappingQuotes(rule.eventId) || buildEventIdFromUrl(eventUrl) || null;
+  const sections = Array.isArray(rule.sections)
+    ? rule.sections.map((section) => stripWrappingQuotes(section)).filter(Boolean)
+    : splitList(rule.sections);
+
+  if (!eventUrl && !eventId) {
+    throw new Error(`FEISHU_SECTION_FILTERS[${index}] must include eventUrl or eventId.`);
+  }
+
+  if (!sections.length) {
+    throw new Error(`FEISHU_SECTION_FILTERS[${index}] must include at least one section.`);
+  }
+
+  return {
+    eventUrl,
+    eventId,
+    sections: [...new Set(sections)],
+  };
+}
+
+function parseFeishuSectionFilters(value) {
+  const raw = stripWrappingQuotes(value);
+  if (!raw) {
+    return [];
+  }
+
+  let parsed = null;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (error) {
+    throw new Error(`Invalid FEISHU_SECTION_FILTERS JSON: ${error.message}`);
+  }
+
+  if (!Array.isArray(parsed)) {
+    throw new Error('FEISHU_SECTION_FILTERS must be a JSON array.');
+  }
+
+  return parsed.map(normalizeFeishuSectionFilterRule);
+}
+
 function loadConfig(argv = []) {
   const cli = parseCliArgs(argv);
   const supabaseServiceRoleKey = stripWrappingQuotes(process.env.SUPABASE_SERVICE_ROLE_KEY) || null;
@@ -66,6 +113,7 @@ function loadConfig(argv = []) {
     alertOnPriceChange: parseBoolean(process.env.ALERT_ON_PRICE_CHANGE, false),
     minTicketDelta: Math.max(1, parseNumber(process.env.MIN_TICKET_DELTA, 1)),
     maxDiffItemsInAlert: Math.max(1, parseNumber(process.env.MAX_DIFF_ITEMS_IN_ALERT, 10)),
+    feishuSectionFilters: parseFeishuSectionFilters(process.env.FEISHU_SECTION_FILTERS),
     navigationTimeoutMs: Math.max(1000, parseNumber(process.env.NAVIGATION_TIMEOUT_MS, 80000)),
     jsonInterceptTimeoutMs: Math.max(1000, parseNumber(process.env.JSON_INTERCEPT_TIMEOUT_MS, 15000)),
     pageSettleDelayMinMs: Math.max(0, parseNumber(process.env.PAGE_SETTLE_DELAY_MIN_MS, 10000)),

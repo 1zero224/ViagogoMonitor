@@ -1,11 +1,17 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const { buildFeishuMessagePayload, buildInventoryMessageText, initializeFeishuNotifier } = require('../src/notify');
+const {
+  buildFeishuMessagePayload,
+  buildInventoryMessageText,
+  filterDiffForFeishuSections,
+  initializeFeishuNotifier,
+} = require('../src/notify');
 
 function buildPayload() {
   return {
     snapshot: {
+      eventId: '159436715',
       eventUrl: 'https://www.viagogo.com/Concert-Tickets/Rock/E-159436715?quantity=2',
       capturedAt: '2026-03-19T12:05:00.000Z',
       event: {
@@ -69,6 +75,7 @@ test('buildInventoryMessageText builds a grouped Feishu-friendly plain text mess
   assert.match(text, /挂单总数: 5 \(\+2\)/);
   assert.match(text, /主要库存变更:/);
   assert.match(text, /新增挂单: M15 \/ 行 A \/ 座位 1-2 \/ 挂单 9001/);
+  assert.match(text, /链接 https:\/\/www\.viagogo\.com\/Concert-Tickets\/Rock\/E-159436715\?quantity=2/);
 });
 
 test('buildInventoryMessageText omits noisy row and seat placeholders when normalized listing metadata is empty', () => {
@@ -91,6 +98,61 @@ test('buildInventoryMessageText omits noisy row and seat placeholders when norma
   assert.match(text, /新增挂单: M \/ 挂单 9001/);
   assert.doesNotMatch(text, /座位 _/);
   assert.doesNotMatch(text, /行 null/);
+});
+
+test('filterDiffForFeishuSections keeps only configured sections for the matching event', () => {
+  const payload = buildPayload();
+  payload.snapshot.eventId = '159991465';
+  payload.snapshot.eventUrl = 'https://www.viagogo.com/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465?quantity=1';
+  payload.diff.changes = [
+    {
+      type: 'new_listing_available',
+      sectionName: 'B',
+      rowId: null,
+      seat: null,
+      listingId: '9001',
+      newTicketCount: 2,
+      newPrice: 199,
+    },
+    {
+      type: 'listing_ticket_count_increased',
+      sectionName: 'Z',
+      rowId: null,
+      seat: null,
+      listingId: '9002',
+      oldTicketCount: 1,
+      newTicketCount: 3,
+      newPrice: 299,
+    },
+  ];
+  payload.diff.changeCount = payload.diff.changes.length;
+  payload.config.feishuSectionFilters = [
+    {
+      eventUrl: 'https://www.viagogo.com/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465?quantity=1',
+      eventId: '159991465',
+      sections: ['B', 'N', 'G'],
+    },
+  ];
+
+  const filtered = filterDiffForFeishuSections(payload);
+
+  assert.equal(filtered.changeCount, 1);
+  assert.equal(filtered.changes[0].sectionName, 'B');
+  assert.equal(filtered.sectionFilter.enabled, true);
+  assert.deepEqual(filtered.sectionFilter.allowedSections, ['B', 'N', 'G']);
+  assert.equal(filtered.sectionFilter.filteredOutChangeCount, 1);
+});
+
+test('buildInventoryMessageText shows active Feishu section filters', () => {
+  const payload = buildPayload();
+  payload.diff.sectionFilter = {
+    enabled: true,
+    allowedSections: ['B', 'N', 'G'],
+  };
+
+  const text = buildInventoryMessageText(payload);
+
+  assert.match(text, /分区过滤: B, N, G/);
 });
 
 test('buildFeishuMessagePayload wraps the text in the expected webhook contract', () => {
