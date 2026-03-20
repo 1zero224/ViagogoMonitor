@@ -3,24 +3,35 @@ function isListingAvailabilityChange(change) {
     && (change.type === 'new_listing_available' || change.type === 'listing_removed');
 }
 
-function getListingRecord(snapshot, listingId) {
-  if (!snapshot || !listingId) {
+function getComparableListings(snapshot) {
+  const stableListings = snapshot?.stableListings || {};
+  if (Object.keys(stableListings).length > 0) {
+    return stableListings;
+  }
+
+  return snapshot?.listings || {};
+}
+
+function getListingRecord(snapshot, listingKey) {
+  if (!snapshot || !listingKey) {
     return null;
   }
 
-  return snapshot.listings?.[listingId] || null;
+  return getComparableListings(snapshot)?.[listingKey] || null;
 }
 
-function hasListingStock(snapshot, listingId) {
-  return (getListingRecord(snapshot, listingId)?.availableTickets || 0) > 0;
+function hasListingStock(snapshot, listingKey) {
+  return (getListingRecord(snapshot, listingKey)?.availableTickets || 0) > 0;
 }
 
-function createListingAvailabilityChange(type, listingId, previousListing, currentListing) {
+function createListingAvailabilityChange(type, listingKey, previousListing, currentListing) {
   const source = currentListing || previousListing || {};
   return {
     type,
     entityType: 'listing',
-    listingId,
+    listingKey,
+    listingId: source.listingId || listingKey,
+    sourceListingIds: source.sourceListingIds || [],
     sectionName: source.sectionName || 'Unknown Section',
     rowId: source.rowId || null,
     seat: source.seat || null,
@@ -40,7 +51,7 @@ function buildDebouncedListingAvailabilityChanges({ currentSnapshot, previousSna
 
   const listingIds = new Set();
   for (const snapshot of history) {
-    for (const listingId of Object.keys(snapshot?.listings || {})) {
+    for (const listingId of Object.keys(getComparableListings(snapshot))) {
       listingIds.add(listingId);
     }
   }
@@ -121,10 +132,10 @@ function buildAlertDiff({ diff, currentSnapshot, previousSnapshots = [], config 
       suppressedRawAvailabilityChangeCount: rawAvailabilityChanges.length,
       emittedDebouncedAvailabilityChangeCount: debouncedAvailabilityChanges.length,
       suppressedListingIds: rawAvailabilityChanges
-        .map((change) => `${change.type}:${change.listingId}`)
+        .map((change) => `${change.type}:${change.listingKey || change.listingId}`)
         .slice(0, 20),
       emittedListingIds: debouncedAvailabilityChanges
-        .map((change) => `${change.type}:${change.listingId}`)
+        .map((change) => `${change.type}:${change.listingKey || change.listingId}`)
         .slice(0, 20),
     },
   };

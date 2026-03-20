@@ -23,12 +23,16 @@ Each successful scrape produces a normalized snapshot with:
 - `sections`
 - `rows`
 - `listings`
+- `stableListings`
 - `meta`
 
-The important contract decision is that listing-level monitoring now uses a stable listing key:
+The important contract decision is that the snapshot keeps two listing views:
+
+- `listings`: raw page-visible listing cards keyed by `listingId`
+- `stableListings`: deduplicated comparison entities keyed by:
 
 ```text
-<listingId>
+<aipHash || listingId>
 ```
 
 Row aggregates are still kept for summary and compatibility. They remain keyed by:

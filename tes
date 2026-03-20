@@ -1,0 +1,79 @@
+[2026-03-20 08:15:48.459] [Plug] [INFO] [plugin_upload_gbc_bot.main:715]: [Instagram] 开始轮询账号 @mirei_togetoge (backend=hybrid_playwright)
+[2026-03-20 08:15:57.147] [Plug] [INFO] [plugin_upload_gbc_bot.main:764]: [Instagram] 账号信息获取成功: @mirei_togetoge, display_name=美怜 / ガールズバンドクライ 安和すばる役 / トゲナシトゲアリ Dr., user_id=61709083308
+[2026-03-20 08:15:57.151] [Plug] [INFO] [plugin_upload_gbc_bot.main:770]: [Instagram] 账号 @mirei_togetoge 快照获取耗时: 8.7s
+[2026-03-20 08:15:57.151] [Plug] [INFO] [plugin_upload_gbc_bot.main:788]: [Instagram] 开始抓取 @mirei_togetoge 普通动态: limit=4, backend=hybrid_playwright
+[2026-03-20 08:29:07.457] [Plug] [INFO] [plugin_upload_gbc_bot.main:799]: [Instagram] @mirei_togetoge 普通动态抓取完成: fetched=4, elapsed=790.3s
+[2026-03-20 08:29:07.458] [Plug] [INFO] [plugin_upload_gbc_bot.main:988]: [Instagram] @mirei_togetoge 普通动态对比完成：3 条新增/更新，1 条未变化
+[2026-03-20 08:29:11.629] [Plug] [INFO] [plugin_upload_gbc_bot.main:2293]: [Instagram] 开始推送更新: label=美怜 / ガールズバンドクライ 安和すばる役 / トゲナシトゲアリ Dr. (@mirei_togetoge), source=instagram_target_groups, targets=1, media=1, extra_images=0
+[2026-03-20 08:29:20.203] [Plug] [INFO] [plugin_upload_gbc_bot.main:2293]: [Instagram] 开始推送更新: label=美怜 / ガールズバンドクライ 安和すばる役 / トゲナシトゲアリ Dr. (@mirei_togetoge), source=instagram_target_groups, targets=1, media=1, extra_images=0
+[2026-03-20 08:29:29.490] [Plug] [INFO] [plugin_upload_gbc_bot.main:2293]: [Instagram] 开始推送更新: label=美怜 / ガールズバンドクライ 安和すばる役 / トゲナシトゲアリ Dr. (@mirei_togetoge), source=instagram_target_groups, targets=1, media=1, extra_images=0
+[2026-03-20 08:29:30.893] [Plug] [INFO] [plugin_upload_gbc_bot.main:810]: [Instagram] @mirei_togetoge 普通动态处理完成: fetched=4, changed=3, pushed=3, total_elapsed=813.7s
+[2026-03-20 08:29:30.898] [Plug] [INFO] [plugin_upload_gbc_bot.main:859]: [Instagram] 开始抓取 @mirei_togetoge Story: backend=hybrid_playwright
+[2026-03-20 08:49:35.939] [Plug] [ERRO] [v4.18.1] [plugin_upload_gbc_bot.main:915]: [Instagram] 获取 @mirei_togetoge Story 失败 (elapsed=1205.0s): InstagramSupportError: Playwright sidecar 执行超时: command=current_stories, timeout=1200s, last_stage=snapinsta.wait_results, detail=elapsed_ms=1186384, attempt=1, waited_ms=1016927, has_download_links=False, has_no_media_text=False, has_processing_text=False, has_turnstile_widget=False, has_turnstile_response=False, progress_age=13.6s
+[2026-03-20 08:49:35.941] [Plug] [INFO] [plugin_upload_gbc_bot.main:924]: [Instagram] 账号 @mirei_togetoge 轮询结果: posts=4(新增/更新=3, 推送=3), stories=0(新增=0, 推送=0), elapsed=2027.5s
+[2026-03-20 08:49:35.946] [Plug] [INFO] [plugin_upload_gbc_bot.main:715]: [Instagram] 开始轮询账号 @yuri_togetoge (backend=hybrid_playwright)
+[2026-03-20 08:49:46.918] [Plug] [INFO] [plugin_upload_gbc_bot.main:764]: [Instagram] 账号信息获取成功: @yuri_togetoge, display_name=夕莉 / トゲナシトゲアリ Gt., user_id=61375674127
+[2026-03-20 08:49:46.920] [Plug] [INFO] [plugin_upload_gbc_bot.main:770]: [Instagram] 账号 @yuri_togetoge 快照获取耗时: 11.0s
+[2026-03-20 08:49:46.920] [Plug] [INFO] [plugin_upload_gbc_bot.main:788]: [Instagram] 开始抓取 @yuri_togetoge 普通动态: limit=4, backend=hybrid_playwright
+[2026-03-20 09:01:38.626] [Plug] [INFO] [plugin_upload_gbc_bot.main:799]: [Instagram] @yuri_togetoge 普通动态抓取完成: fetched=4, elapsed=711.7s
+[2026-03-20 09:01:38.628] [Plug] [INFO] [plugin_upload_gbc_bot.main:988]: [Instagram] @yuri_togetoge 普通动态对比完成：0 条新增/更新，4 条未变化
+[2026-03-20 09:01:38.633] [Plug] [INFO] [plugin_upload_gbc_bot.main:810]: [Instagram] @yuri_togetoge 普通动态处理完成: fetched=4, changed=0, pushed=0, total_elapsed=711.7s
+[2026-03-20 09:01:38.638] [Plug] [INFO] [plugin_upload_gbc_bot.main:859]: [Instagram] 开始抓取 @yuri_togetoge Story: backend=hybrid_playwright
+[2026-03-20 09:04:49.071] [Plug] [INFO] [plugin_upload_gbc_bot.main:866]: [Instagram] @yuri_togetoge Story 抓取完成: fetched=3, elapsed=190.4s
+[2026-03-20 09:04:49.074] [Plug] [INFO] [plugin_upload_gbc_bot.main:1041]: [Instagram] @yuri_togetoge Story 对比完成：0 条新增，3 条已存在
+[2026-03-20 09:04:49.075] [Plug] [INFO] [plugin_upload_gbc_bot.main:877]: [Instagram] @yuri_togetoge Story 处理完成: fetched=3, new=0, pushed=0, total_elapsed=190.4s
+[2026-03-20 09:04:49.079] [Plug] [INFO] [plugin_upload_gbc_bot.main:924]: [Instagram] 账号 @yuri_togetoge 轮询结果: posts=4(新增/更新=0, 推送=0), stories=3(新增=0, 推送=0), elapsed=913.1s，无新内容因此未推送
+[2026-03-20 09:04:49.086] [Plug] [INFO] [plugin_upload_gbc_bot.main:715]: [Instagram] 开始轮询账号 @natsu_togetoge (backend=hybrid_playwright)
+[2026-03-20 09:04:57.079] [Plug] [INFO] [plugin_upload_gbc_bot.main:764]: [Instagram] 账号信息获取成功: @natsu_togetoge, display_name=凪都 / ガールズバンドクライ 海老塚智役 / トゲナシトゲアリ Key., user_id=61360387665
+[2026-03-20 09:04:57.081] [Plug] [INFO] [plugin_upload_gbc_bot.main:770]: [Instagram] 账号 @natsu_togetoge 快照获取耗时: 8.0s
+[2026-03-20 09:04:57.081] [Plug] [INFO] [plugin_upload_gbc_bot.main:788]: [Instagram] 开始抓取 @natsu_togetoge 普通动态: limit=4, backend=hybrid_playwright
+[2026-03-20 09:17:36.682] [Plug] [INFO] [plugin_upload_gbc_bot.main:799]: [Instagram] @natsu_togetoge 普通动态抓取完成: fetched=4, elapsed=759.6s
+[2026-03-20 09:17:36.684] [Plug] [INFO] [plugin_upload_gbc_bot.main:988]: [Instagram] @natsu_togetoge 普通动态对比完成：3 条新增/更新，1 条未变化
+[2026-03-20 09:17:42.372] [Plug] [INFO] [plugin_upload_gbc_bot.main:2293]: [Instagram] 开始推送更新: label=凪都 / ガールズバンドクライ 海老塚智役 / トゲナシトゲアリ Key. (@natsu_togetoge), source=instagram_target_groups, targets=1, media=1, extra_images=0
+[2026-03-20 09:17:50.763] [Plug] [INFO] [plugin_upload_gbc_bot.main:2293]: [Instagram] 开始推送更新: label=凪都 / ガールズバンドクライ 海老塚智役 / トゲナシトゲアリ Key. (@natsu_togetoge), source=instagram_target_groups, targets=1, media=1, extra_images=0
+[2026-03-20 09:18:03.987] [Plug] [INFO] [plugin_upload_gbc_bot.main:2293]: [Instagram] 开始推送更新: label=凪都 / ガールズバンドクライ 海老塚智役 / トゲナシトゲアリ Key. (@natsu_togetoge), source=instagram_target_groups, targets=1, media=1, extra_images=0
+[2026-03-20 09:18:10.333] [Plug] [INFO] [plugin_upload_gbc_bot.main:810]: [Instagram] @natsu_togetoge 普通动态处理完成: fetched=4, changed=3, pushed=3, total_elapsed=793.3s
+[2026-03-20 09:18:10.336] [Plug] [INFO] [plugin_upload_gbc_bot.main:859]: [Instagram] 开始抓取 @natsu_togetoge Story: backend=hybrid_playwright
+[2026-03-20 09:38:15.383] [Plug] [ERRO] [v4.18.1] [plugin_upload_gbc_bot.main:915]: [Instagram] 获取 @natsu_togetoge Story 失败 (elapsed=1205.0s): InstagramSupportError: Playwright sidecar 执行超时: command=current_stories, timeout=1200s, last_stage=snapinsta.wait_results, detail=elapsed_ms=1196416, attempt=1, waited_ms=1047669, has_download_links=False, has_no_media_text=False, has_processing_text=False, has_turnstile_widget=False, has_turnstile_response=False, progress_age=3.6s
+[2026-03-20 09:38:15.384] [Plug] [INFO] [plugin_upload_gbc_bot.main:924]: [Instagram] 账号 @natsu_togetoge 轮询结果: posts=4(新增/更新=3, 推送=3), stories=0(新增=0, 推送=0), elapsed=2006.3s
+[2026-03-20 09:38:15.387] [Plug] [INFO] [plugin_upload_gbc_bot.main:715]: [Instagram] 开始轮询账号 @rina_togetoge (backend=hybrid_playwright)
+[2026-03-20 09:38:26.642] [Plug] [INFO] [plugin_upload_gbc_bot.main:764]: [Instagram] 账号信息获取成功: @rina_togetoge, display_name=理名 / トゲナシトゲアリ Vo., user_id=61519451182
+[2026-03-20 09:38:26.643] [Plug] [INFO] [plugin_upload_gbc_bot.main:770]: [Instagram] 账号 @rina_togetoge 快照获取耗时: 11.3s
+[2026-03-20 09:38:26.644] [Plug] [INFO] [plugin_upload_gbc_bot.main:788]: [Instagram] 开始抓取 @rina_togetoge 普通动态: limit=4, backend=hybrid_playwright
+[2026-03-20 09:51:08.294] [Plug] [INFO] [plugin_upload_gbc_bot.main:799]: [Instagram] @rina_togetoge 普通动态抓取完成: fetched=4, elapsed=761.6s
+[2026-03-20 09:51:08.295] [Plug] [INFO] [plugin_upload_gbc_bot.main:988]: [Instagram] @rina_togetoge 普通动态对比完成：1 条新增/更新，3 条未变化
+[2026-03-20 09:51:16.853] [Plug] [INFO] [plugin_upload_gbc_bot.main:2293]: [Instagram] 开始推送更新: label=理名 / トゲナシトゲアリ Vo. (@rina_togetoge), source=instagram_target_groups, targets=1, media=1, extra_images=0
+[2026-03-20 09:51:18.288] [Plug] [INFO] [plugin_upload_gbc_bot.main:810]: [Instagram] @rina_togetoge 普通动态处理完成: fetched=4, changed=1, pushed=1, total_elapsed=771.6s
+[2026-03-20 09:51:18.291] [Plug] [INFO] [plugin_upload_gbc_bot.main:859]: [Instagram] 开始抓取 @rina_togetoge Story: backend=hybrid_playwright
+[2026-03-20 10:11:23.327] [Plug] [ERRO] [v4.18.1] [plugin_upload_gbc_bot.main:915]: [Instagram] 获取 @rina_togetoge Story 失败 (elapsed=1205.0s): InstagramSupportError: Playwright sidecar 执行超时: command=current_stories, timeout=1200s, last_stage=snapinsta.wait_results, detail=elapsed_ms=1191566, attempt=1, waited_ms=1017201, has_download_links=False, has_no_media_text=False, has_processing_text=False, has_turnstile_widget=False, has_turnstile_response=False, progress_age=8.4s
+[2026-03-20 10:11:23.329] [Plug] [INFO] [plugin_upload_gbc_bot.main:924]: [Instagram] 账号 @rina_togetoge 轮询结果: posts=4(新增/更新=1, 推送=1), stories=0(新增=0, 推送=0), elapsed=1987.9s
+[2026-03-20 10:11:23.334] [Plug] [INFO] [plugin_upload_gbc_bot.main:660]: [Instagram] 本轮轮询摘要: 账号 5/5 个，失败 3 个，普通动态 20 条（新增/更新 7，推送 7），Story 6 条（新增 0，推送 0）
+[2026-03-20 10:11:23.334] [Plug] [INFO] [plugin_upload_gbc_bot.main:672]: [Instagram] 本轮计划轮询完成，用时 7883 秒，完成时间 2026-03-20 18:11:23 +0800
+[2026-03-20 10:11:23.334] [Plug] [INFO] [plugin_upload_gbc_bot.main:640]: [Instagram] 下一次计划轮询时间: 2026-03-20 20:00:00 +0800 (基准: UTC+8 00:00, 剩余 6516 秒)
+[2026-03-20 12:12:06.401] [Plug] [INFO] [plugin_upload_gbc_bot.main:799]: [Instagram] @shuri_togetoge 普通动态抓取完成: fetched=4, elapsed=716.4s
+[2026-03-20 12:12:06.403] [Plug] [INFO] [plugin_upload_gbc_bot.main:988]: [Instagram] @shuri_togetoge 普通动态对比完成：0 条新增/更新，4 条未变化
+[2026-03-20 12:12:06.409] [Plug] [INFO] [plugin_upload_gbc_bot.main:810]: [Instagram] @shuri_togetoge 普通动态处理完成: fetched=4, changed=0, pushed=0, total_elapsed=716.4s
+[2026-03-20 12:12:06.413] [Plug] [INFO] [plugin_upload_gbc_bot.main:859]: [Instagram] 开始抓取 @shuri_togetoge Story: backend=hybrid_playwright
+[2026-03-20 12:32:11.436] [Plug] [ERRO] [v4.18.1] [plugin_upload_gbc_bot.main:915]: [Instagram] 获取 @shuri_togetoge Story 失败 (elapsed=1205.0s): InstagramSupportError: Playwright sidecar 执行超时: command=current_stories, timeout=1200s, last_stage=snapinsta.wait_results, detail=elapsed_ms=1170654, attempt=1, waited_ms=986090, has_download_links=False, has_no_media_text=False, has_processing_text=False, has_turnstile_widget=False, has_turnstile_response=False, progress_age=29.3s
+[2026-03-20 12:32:11.438] [Plug] [INFO] [plugin_upload_gbc_bot.main:924]: [Instagram] 账号 @shuri_togetoge 轮询结果: posts=4(新增/更新=0, 推送=0), stories=0(新增=0, 推送=0), elapsed=1931.4s，无新内容因此未推送
+[2026-03-20 12:32:11.442] [Plug] [INFO] [plugin_upload_gbc_bot.main:715]: [Instagram] 开始轮询账号 @mirei_togetoge (backend=hybrid_playwright)
+[2026-03-20 12:32:20.934] [Plug] [INFO] [plugin_upload_gbc_bot.main:764]: [Instagram] 账号信息获取成功: @mirei_togetoge, display_name=美怜 / ガールズバンドクライ 安和すばる役 / トゲナシトゲアリ Dr., user_id=61709083308
+[2026-03-20 12:32:20.935] [Plug] [INFO] [plugin_upload_gbc_bot.main:770]: [Instagram] 账号 @mirei_togetoge 快照获取耗时: 9.5s
+[2026-03-20 12:32:20.936] [Plug] [INFO] [plugin_upload_gbc_bot.main:788]: [Instagram] 开始抓取 @mirei_togetoge 普通动态: limit=4, backend=hybrid_playwright
+[2026-03-20 12:44:55.629] [Plug] [INFO] [plugin_upload_gbc_bot.main:799]: [Instagram] @mirei_togetoge 普通动态抓取完成: fetched=4, elapsed=754.7s
+[2026-03-20 12:44:55.631] [Plug] [INFO] [plugin_upload_gbc_bot.main:988]: [Instagram] @mirei_togetoge 普通动态对比完成：3 条新增/更新，1 条未变化
+[2026-03-20 12:45:00.533] [Plug] [INFO] [plugin_upload_gbc_bot.main:2293]: [Instagram] 开始推送更新: label=美怜 / ガールズバンドクライ 安和すばる役 / トゲナシトゲアリ Dr. (@mirei_togetoge), source=instagram_target_groups, targets=1, media=1, extra_images=0
+[2026-03-20 12:45:10.164] [Plug] [INFO] [plugin_upload_gbc_bot.main:2293]: [Instagram] 开始推送更新: label=美怜 / ガールズバンドクライ 安和すばる役 / トゲナシトゲアリ Dr. (@mirei_togetoge), source=instagram_target_groups, targets=1, media=1, extra_images=0
+[2026-03-20 12:45:20.487] [Plug] [INFO] [plugin_upload_gbc_bot.main:2293]: [Instagram] 开始推送更新: label=美怜 / ガールズバンドクライ 安和すばる役 / トゲナシトゲアリ Dr. (@mirei_togetoge), source=instagram_target_groups, targets=1, media=1, extra_images=0
+[2026-03-20 12:45:21.817] [Plug] [INFO] [plugin_upload_gbc_bot.main:810]: [Instagram] @mirei_togetoge 普通动态处理完成: fetched=4, changed=3, pushed=3, total_elapsed=780.9s
+[2026-03-20 12:45:21.821] [Plug] [INFO] [plugin_upload_gbc_bot.main:859]: [Instagram] 开始抓取 @mirei_togetoge Story: backend=hybrid_playwright
+[2026-03-20 13:05:26.848] [Plug] [ERRO] [v4.18.1] [plugin_upload_gbc_bot.main:915]: [Instagram] 获取 @mirei_togetoge Story 失败 (elapsed=1205.0s): InstagramSupportError: Playwright sidecar 执行超时: command=current_stories, timeout=1200s, last_stage=snapinsta.wait_results, detail=elapsed_ms=1175109, attempt=1, waited_ms=1016819, has_download_links=False, has_no_media_text=False, has_processing_text=False, has_turnstile_widget=False, has_turnstile_response=False, progress_age=24.9s
+[2026-03-20 13:05:26.850] [Plug] [INFO] [plugin_upload_gbc_bot.main:924]: [Instagram] 账号 @mirei_togetoge 轮询结果: posts=4(新增/更新=3, 推送=3), stories=0(新增=0, 推送=0), elapsed=1995.4s
+[2026-03-20 13:05:26.856] [Plug] [INFO] [plugin_upload_gbc_bot.main:715]: [Instagram] 开始轮询账号 @yuri_togetoge (backend=hybrid_playwright)
+[2026-03-20 13:05:36.715] [Plug] [INFO] [plugin_upload_gbc_bot.main:764]: [Instagram] 账号信息获取成功: @yuri_togetoge, display_name=夕莉 / トゲナシトゲアリ Gt., user_id=61375674127
+[2026-03-20 13:05:36.730] [Plug] [INFO] [plugin_upload_gbc_bot.main:770]: [Instagram] 账号 @yuri_togetoge 快照获取耗时: 9.9s
+[2026-03-20 13:05:36.738] [Plug] [INFO] [plugin_upload_gbc_bot.main:788]: [Instagram] 开始抓取 @yuri_togetoge 普通动态: limit=4, backend=hybrid_playwright
+[2026-03-20 13:17:27.612] [Plug] [INFO] [plugin_upload_gbc_bot.main:799]: [Instagram] @yuri_togetoge 普通动态抓取完成: fetched=4, elapsed=710.9s
+[2026-03-20 13:17:27.614] [Plug] [INFO] [plugin_upload_gbc_bot.main:988]: [Instagram] @yuri_togetoge 普通动态对比完成：0 条新增/更新，4 条未变化
+[2026-03-20 13:17:27.620] [Plug] [INFO] [plugin_upload_gbc_bot.main:810]: [Instagram] @yuri_togetoge 普通动态处理完成: fetched=4, changed=0, pushed=0, total_elapsed=710.9s
+[2026-03-20 13:17:27.624] [Plug] [INFO] [plugin_upload_gbc_bot.main:859]: [Instagram] 开始抓取 @yuri_togetoge Story: backend=hybrid_playwright

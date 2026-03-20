@@ -118,3 +118,98 @@ test('buildCompatibilitySnapshot rebuilds a previous snapshot from previousprice
   assert.equal(snapshot.rows['267_56342_A'].sectionName, 'M15');
   assert.equal(snapshot.meta.comparisonEntity, 'row');
 });
+
+test('buildInventorySnapshot collapses duplicated listing variants that share aipHash and removes noisy speculative row labels', () => {
+  const snapshot = buildInventorySnapshot({
+    eventUrl: 'https://www.viagogo.com/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465?quantity=1',
+    eventId: '159991465',
+    eventDetails: {
+      name: 'ZUTOMAYO Tickets',
+    },
+    sections: [],
+    listingItems: [
+      {
+        id: 1001,
+        aipHash: 'stable-a',
+        sectionId: 724540,
+        sectionMapName: 'M',
+        row: 'chair',
+        rowContent: 'Row chair',
+        rowId: 25957,
+        seat: '_',
+        isSpeculativeRow: true,
+        availableTickets: 4,
+        rawPrice: 204.08,
+        price: '$204',
+        buyerCurrencyCode: 'USD',
+      },
+      {
+        id: 1002,
+        aipHash: 'stable-a',
+        sectionId: 724540,
+        sectionMapName: 'M',
+        row: 'Ok',
+        rowContent: 'Row Ok',
+        rowId: 25957,
+        seat: '_',
+        isSpeculativeRow: true,
+        availableTickets: 4,
+        rawPrice: 204.08,
+        price: '$204',
+        buyerCurrencyCode: 'USD',
+      },
+      {
+        id: 1003,
+        aipHash: 'stable-a',
+        sectionId: 724540,
+        sectionMapName: 'M',
+        row: '排',
+        rowContent: 'Row 排',
+        rowId: 25957,
+        seat: '_',
+        isSpeculativeRow: true,
+        availableTickets: 4,
+        rawPrice: 204.08,
+        price: '$204',
+        buyerCurrencyCode: 'USD',
+      },
+      {
+        id: 1004,
+        aipHash: 'stable-a',
+        sectionId: 724540,
+        sectionMapName: 'M',
+        row: 'Row',
+        rowContent: 'Row Row',
+        rowId: 25957,
+        seat: '_',
+        isSpeculativeRow: true,
+        availableTickets: 4,
+        rawPrice: 204.08,
+        price: '$204',
+        buyerCurrencyCode: 'USD',
+      },
+      {
+        id: 2001,
+        sectionId: 724529,
+        sectionMapName: 'B',
+        row: 'BJ',
+        rowId: 25769,
+        seat: '16_16',
+        availableTickets: 1,
+        rawPrice: 372.63,
+        price: '$373',
+        buyerCurrencyCode: 'USD',
+      },
+    ],
+  });
+
+  assert.equal(snapshot.summary.totalListingCount, 5);
+  assert.equal(snapshot.summary.stableListingCount, 2);
+  assert.equal(snapshot.meta.collapsedDuplicateListingCount, 3);
+  assert.equal(Object.keys(snapshot.listings).length, 5);
+  assert.equal(Object.keys(snapshot.stableListings).length, 2);
+  assert.deepEqual(snapshot.stableListings['stable-a'].sourceListingIds, ['1001', '1002', '1003', '1004']);
+  assert.equal(snapshot.stableListings['stable-a'].listingId, '1001');
+  assert.equal(snapshot.stableListings['stable-a'].rowId, null);
+  assert.equal(snapshot.stableListings['stable-a'].seat, null);
+});

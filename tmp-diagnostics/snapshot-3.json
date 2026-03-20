@@ -1,0 +1,1275 @@
+{
+  "linkId": null,
+  "eventId": "159991465",
+  "eventUrl": "https://www.viagogo.com/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465?quantity=1",
+  "capturedAt": "2026-03-20T13:48:09.828Z",
+  "source": "event_page_json",
+  "event": {
+    "name": "Zutomayo Tickets",
+    "date": null,
+    "location": null,
+    "imageUrl": "https://media.stubhubstatic.com/stubhub-v2-catalog/d_vgg-defaultLogo.jpg/t_f-fs-0fv,q_auto:low,f_auto,c_fill,$w_280_mul_3,$h_180_mul_3/categories/119635/6541447"
+  },
+  "summary": {
+    "rowsTracked": 13,
+    "rowsWithStock": 13,
+    "sectionsTracked": 17,
+    "sectionsWithStock": 13,
+    "totalListingCount": 40,
+    "totalTicketCount": 143,
+    "minPrice": 132.36,
+    "currency": "USD"
+  },
+  "sections": {
+    "528503": {
+      "sectionId": 528503,
+      "sectionName": "Stalls",
+      "rowsTracked": 1,
+      "rowsWithStock": 1,
+      "totalListingCount": 1,
+      "totalTicketCount": 2,
+      "hasStock": true,
+      "dataNotFound": false
+    },
+    "528504": {
+      "sectionId": 528504,
+      "sectionName": "Circle 1",
+      "rowsTracked": 1,
+      "rowsWithStock": 1,
+      "totalListingCount": 5,
+      "totalTicketCount": 17,
+      "hasStock": true,
+      "dataNotFound": false
+    },
+    "724528": {
+      "sectionId": 724528,
+      "sectionName": "A",
+      "rowsTracked": 0,
+      "rowsWithStock": 0,
+      "totalListingCount": 0,
+      "totalTicketCount": 0,
+      "hasStock": false,
+      "dataNotFound": true
+    },
+    "724529": {
+      "sectionId": 724529,
+      "sectionName": "B",
+      "rowsTracked": 1,
+      "rowsWithStock": 1,
+      "totalListingCount": 1,
+      "totalTicketCount": 1,
+      "hasStock": true,
+      "dataNotFound": false
+    },
+    "724530": {
+      "sectionId": 724530,
+      "sectionName": "C",
+      "rowsTracked": 1,
+      "rowsWithStock": 1,
+      "totalListingCount": 1,
+      "totalTicketCount": 1,
+      "hasStock": true,
+      "dataNotFound": false
+    },
+    "724531": {
+      "sectionId": 724531,
+      "sectionName": "D",
+      "rowsTracked": 1,
+      "rowsWithStock": 1,
+      "totalListingCount": 1,
+      "totalTicketCount": 3,
+      "hasStock": true,
+      "dataNotFound": false
+    },
+    "724532": {
+      "sectionId": 724532,
+      "sectionName": "E",
+      "rowsTracked": 0,
+      "rowsWithStock": 0,
+      "totalListingCount": 0,
+      "totalTicketCount": 0,
+      "hasStock": false,
+      "dataNotFound": true
+    },
+    "724533": {
+      "sectionId": 724533,
+      "sectionName": "F",
+      "rowsTracked": 1,
+      "rowsWithStock": 1,
+      "totalListingCount": 1,
+      "totalTicketCount": 1,
+      "hasStock": true,
+      "dataNotFound": false
+    },
+    "724534": {
+      "sectionId": 724534,
+      "sectionName": "G",
+      "rowsTracked": 1,
+      "rowsWithStock": 1,
+      "totalListingCount": 3,
+      "totalTicketCount": 14,
+      "hasStock": true,
+      "dataNotFound": false
+    },
+    "724535": {
+      "sectionId": 724535,
+      "sectionName": "H",
+      "rowsTracked": 1,
+      "rowsWithStock": 1,
+      "totalListingCount": 4,
+      "totalTicketCount": 16,
+      "hasStock": true,
+      "dataNotFound": false
+    },
+    "724537": {
+      "sectionId": 724537,
+      "sectionName": "J",
+      "rowsTracked": 1,
+      "rowsWithStock": 1,
+      "totalListingCount": 5,
+      "totalTicketCount": 18,
+      "hasStock": true,
+      "dataNotFound": false
+    },
+    "724538": {
+      "sectionId": 724538,
+      "sectionName": "K",
+      "rowsTracked": 1,
+      "rowsWithStock": 1,
+      "totalListingCount": 5,
+      "totalTicketCount": 18,
+      "hasStock": true,
+      "dataNotFound": false
+    },
+    "724539": {
+      "sectionId": 724539,
+      "sectionName": "L",
+      "rowsTracked": 1,
+      "rowsWithStock": 1,
+      "totalListingCount": 5,
+      "totalTicketCount": 20,
+      "hasStock": true,
+      "dataNotFound": false
+    },
+    "724540": {
+      "sectionId": 724540,
+      "sectionName": "M",
+      "rowsTracked": 1,
+      "rowsWithStock": 1,
+      "totalListingCount": 4,
+      "totalTicketCount": 16,
+      "hasStock": true,
+      "dataNotFound": false
+    },
+    "724541": {
+      "sectionId": 724541,
+      "sectionName": "N",
+      "rowsTracked": 1,
+      "rowsWithStock": 1,
+      "totalListingCount": 4,
+      "totalTicketCount": 16,
+      "hasStock": true,
+      "dataNotFound": false
+    },
+    "731680": {
+      "sectionId": 731680,
+      "sectionName": "BOX A",
+      "rowsTracked": 0,
+      "rowsWithStock": 0,
+      "totalListingCount": 0,
+      "totalTicketCount": 0,
+      "hasStock": false,
+      "dataNotFound": true
+    },
+    "731681": {
+      "sectionId": 731681,
+      "sectionName": "BOX C",
+      "rowsTracked": 0,
+      "rowsWithStock": 0,
+      "totalListingCount": 0,
+      "totalTicketCount": 0,
+      "hasStock": false,
+      "dataNotFound": true
+    }
+  },
+  "rows": {
+    "303_528503_25995": {
+      "sectionId": 528503,
+      "sectionName": "Stalls",
+      "rowId": "25995",
+      "ticketClassId": 303,
+      "ticketCount": 2,
+      "rawMinPrice": 663.18,
+      "formattedMinPrice": "$663",
+      "listingCount": 1,
+      "dataNotFound": false
+    },
+    "2116_528504_25912": {
+      "sectionId": 528504,
+      "sectionName": "Circle 1",
+      "rowId": "25912",
+      "ticketClassId": 2116,
+      "ticketCount": 17,
+      "rawMinPrice": 149.43,
+      "formattedMinPrice": "$149",
+      "listingCount": 5,
+      "dataNotFound": false
+    },
+    "303_724529_25769": {
+      "sectionId": 724529,
+      "sectionName": "B",
+      "rowId": "25769",
+      "ticketClassId": 303,
+      "ticketCount": 1,
+      "rawMinPrice": 372.76,
+      "formattedMinPrice": "$373",
+      "listingCount": 1,
+      "dataNotFound": false
+    },
+    "303_724530_25796": {
+      "sectionId": 724530,
+      "sectionName": "C",
+      "rowId": "25796",
+      "ticketClassId": 303,
+      "ticketCount": 1,
+      "rawMinPrice": 245.71,
+      "formattedMinPrice": "$246",
+      "listingCount": 1,
+      "dataNotFound": false
+    },
+    "303_724531_25914": {
+      "sectionId": 724531,
+      "sectionName": "D",
+      "rowId": "25914",
+      "ticketClassId": 303,
+      "ticketCount": 3,
+      "rawMinPrice": 132.36,
+      "formattedMinPrice": "$132",
+      "listingCount": 1,
+      "dataNotFound": false
+    },
+    "303_724533_25926": {
+      "sectionId": 724533,
+      "sectionName": "F",
+      "rowId": "25926",
+      "ticketClassId": 303,
+      "ticketCount": 1,
+      "rawMinPrice": 179.3,
+      "formattedMinPrice": "$179",
+      "listingCount": 1,
+      "dataNotFound": false
+    },
+    "2116_724534_25932": {
+      "sectionId": 724534,
+      "sectionName": "G",
+      "rowId": "25932",
+      "ticketClassId": 2116,
+      "ticketCount": 14,
+      "rawMinPrice": 200.53,
+      "formattedMinPrice": "$201",
+      "listingCount": 3,
+      "dataNotFound": false
+    },
+    "2116_724535_25936": {
+      "sectionId": 724535,
+      "sectionName": "H",
+      "rowId": "25936",
+      "ticketClassId": 2116,
+      "ticketCount": 16,
+      "rawMinPrice": 177.04,
+      "formattedMinPrice": "$177",
+      "listingCount": 4,
+      "dataNotFound": false
+    },
+    "2116_724537_25945": {
+      "sectionId": 724537,
+      "sectionName": "J",
+      "rowId": "25945",
+      "ticketClassId": 2116,
+      "ticketCount": 18,
+      "rawMinPrice": 194.49,
+      "formattedMinPrice": "$194",
+      "listingCount": 5,
+      "dataNotFound": false
+    },
+    "2116_724538_25949": {
+      "sectionId": 724538,
+      "sectionName": "K",
+      "rowId": "25949",
+      "ticketClassId": 2116,
+      "ticketCount": 18,
+      "rawMinPrice": 215.67,
+      "formattedMinPrice": "$216",
+      "listingCount": 5,
+      "dataNotFound": false
+    },
+    "2116_724539_25953": {
+      "sectionId": 724539,
+      "sectionName": "L",
+      "rowId": "25953",
+      "ticketClassId": 2116,
+      "ticketCount": 20,
+      "rawMinPrice": 237.92,
+      "formattedMinPrice": "$238",
+      "listingCount": 5,
+      "dataNotFound": false
+    },
+    "2116_724540_25957": {
+      "sectionId": 724540,
+      "sectionName": "M",
+      "rowId": "25957",
+      "ticketClassId": 2116,
+      "ticketCount": 16,
+      "rawMinPrice": 204.08,
+      "formattedMinPrice": "$204",
+      "listingCount": 4,
+      "dataNotFound": false
+    },
+    "2116_724541_25965": {
+      "sectionId": 724541,
+      "sectionName": "N",
+      "rowId": "25965",
+      "ticketClassId": 2116,
+      "ticketCount": 16,
+      "rawMinPrice": 249.33,
+      "formattedMinPrice": "$249",
+      "listingCount": 4,
+      "dataNotFound": false
+    }
+  },
+  "listings": {
+    "11900868485": {
+      "listingId": "11900868485",
+      "sectionId": 724531,
+      "sectionName": "D",
+      "rowId": "DJ",
+      "rowInternalId": "25914",
+      "seat": "3_5",
+      "ticketClassId": 303,
+      "ticketClassName": "Stalls",
+      "availableTickets": 3,
+      "rawPrice": 132.36,
+      "formattedPrice": "$132",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-02-24T06:43:43.3470000Z"
+    },
+    "11810780233": {
+      "listingId": "11810780233",
+      "sectionId": 528504,
+      "sectionName": "Circle 1",
+      "rowId": "Row",
+      "rowInternalId": "25912",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 1,
+      "rawPrice": 149.43,
+      "formattedPrice": "$149",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-02-14T13:33:00.0570000Z"
+    },
+    "11411512832": {
+      "listingId": "11411512832",
+      "sectionId": 528504,
+      "sectionName": "Circle 1",
+      "rowId": "chair",
+      "rowInternalId": "25912",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 152.45,
+      "formattedPrice": "$152",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.3000000Z"
+    },
+    "11411512831": {
+      "listingId": "11411512831",
+      "sectionId": 528504,
+      "sectionName": "Circle 1",
+      "rowId": "排",
+      "rowInternalId": "25912",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 152.45,
+      "formattedPrice": "$152",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.3000000Z"
+    },
+    "11411512833": {
+      "listingId": "11411512833",
+      "sectionId": 528504,
+      "sectionName": "Circle 1",
+      "rowId": "Row",
+      "rowInternalId": "25912",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 152.45,
+      "formattedPrice": "$152",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.3030000Z"
+    },
+    "11411512837": {
+      "listingId": "11411512837",
+      "sectionId": 528504,
+      "sectionName": "Circle 1",
+      "rowId": "Ok",
+      "rowInternalId": "25912",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 152.45,
+      "formattedPrice": "$152",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.3100000Z"
+    },
+    "11411512838": {
+      "listingId": "11411512838",
+      "sectionId": 724535,
+      "sectionName": "H",
+      "rowId": "chair",
+      "rowInternalId": "25936",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 177.04,
+      "formattedPrice": "$177",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.3100000Z"
+    },
+    "11411512843": {
+      "listingId": "11411512843",
+      "sectionId": 724535,
+      "sectionName": "H",
+      "rowId": "Ok",
+      "rowInternalId": "25936",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 177.04,
+      "formattedPrice": "$177",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.3170000Z"
+    },
+    "11411512845": {
+      "listingId": "11411512845",
+      "sectionId": 724535,
+      "sectionName": "H",
+      "rowId": "Row",
+      "rowInternalId": "25936",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 177.04,
+      "formattedPrice": "$177",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.3200000Z"
+    },
+    "11411512850": {
+      "listingId": "11411512850",
+      "sectionId": 724535,
+      "sectionName": "H",
+      "rowId": "排",
+      "rowInternalId": "25936",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 177.04,
+      "formattedPrice": "$177",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.3300000Z"
+    },
+    "11986270150": {
+      "listingId": "11986270150",
+      "sectionId": 724533,
+      "sectionName": "F",
+      "rowId": "FE",
+      "rowInternalId": "25926",
+      "seat": "10_10",
+      "ticketClassId": 303,
+      "ticketClassName": "Stalls",
+      "availableTickets": 1,
+      "rawPrice": 179.3,
+      "formattedPrice": "$179",
+      "currencyCode": "USD",
+      "ticketTypeName": "Mobile Transfer ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-03-06T01:57:26.3930000Z"
+    },
+    "11352166272": {
+      "listingId": "11352166272",
+      "sectionId": 724537,
+      "sectionName": "J",
+      "rowId": "Row",
+      "rowInternalId": "25945",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 194.49,
+      "formattedPrice": "$194",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-02T11:20:53.3100000Z"
+    },
+    "11411512858": {
+      "listingId": "11411512858",
+      "sectionId": 724537,
+      "sectionName": "J",
+      "rowId": "chair",
+      "rowInternalId": "25945",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 2,
+      "rawPrice": 195.82,
+      "formattedPrice": "$196",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.3400000Z"
+    },
+    "11411512860": {
+      "listingId": "11411512860",
+      "sectionId": 724537,
+      "sectionName": "J",
+      "rowId": "Ok",
+      "rowInternalId": "25945",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 195.82,
+      "formattedPrice": "$196",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.3470000Z"
+    },
+    "11411512861": {
+      "listingId": "11411512861",
+      "sectionId": 724537,
+      "sectionName": "J",
+      "rowId": "排",
+      "rowInternalId": "25945",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 195.82,
+      "formattedPrice": "$196",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.3470000Z"
+    },
+    "11411512864": {
+      "listingId": "11411512864",
+      "sectionId": 724537,
+      "sectionName": "J",
+      "rowId": "Row",
+      "rowInternalId": "25945",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 195.82,
+      "formattedPrice": "$196",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.3600000Z"
+    },
+    "11775244999": {
+      "listingId": "11775244999",
+      "sectionId": 724534,
+      "sectionName": "G",
+      "rowId": "Row",
+      "rowInternalId": "25932",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 6,
+      "rawPrice": 200.53,
+      "formattedPrice": "$201",
+      "currencyCode": "USD",
+      "ticketTypeName": "Mobile Transfer ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-02-11T09:56:30.9970000Z"
+    },
+    "11411512840": {
+      "listingId": "11411512840",
+      "sectionId": 724540,
+      "sectionName": "M",
+      "rowId": "chair",
+      "rowInternalId": "25957",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 204.08,
+      "formattedPrice": "$204",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.3130000Z"
+    },
+    "11411512844": {
+      "listingId": "11411512844",
+      "sectionId": 724540,
+      "sectionName": "M",
+      "rowId": "Ok",
+      "rowInternalId": "25957",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 204.08,
+      "formattedPrice": "$204",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.3170000Z"
+    },
+    "11411512842": {
+      "listingId": "11411512842",
+      "sectionId": 724540,
+      "sectionName": "M",
+      "rowId": "排",
+      "rowInternalId": "25957",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 204.08,
+      "formattedPrice": "$204",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.3170000Z"
+    },
+    "11411512872": {
+      "listingId": "11411512872",
+      "sectionId": 724540,
+      "sectionName": "M",
+      "rowId": "Row",
+      "rowInternalId": "25957",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 204.08,
+      "formattedPrice": "$204",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.4100000Z"
+    },
+    "11352166252": {
+      "listingId": "11352166252",
+      "sectionId": 724538,
+      "sectionName": "K",
+      "rowId": "Row",
+      "rowInternalId": "25949",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 2,
+      "rawPrice": 215.67,
+      "formattedPrice": "$216",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-02T11:20:53.2270000Z"
+    },
+    "11411512851": {
+      "listingId": "11411512851",
+      "sectionId": 724538,
+      "sectionName": "K",
+      "rowId": "chair",
+      "rowInternalId": "25949",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 217.04,
+      "formattedPrice": "$217",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.3300000Z"
+    },
+    "11411512854": {
+      "listingId": "11411512854",
+      "sectionId": 724538,
+      "sectionName": "K",
+      "rowId": "Row",
+      "rowInternalId": "25949",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 217.04,
+      "formattedPrice": "$217",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.3300000Z"
+    },
+    "11411512852": {
+      "listingId": "11411512852",
+      "sectionId": 724538,
+      "sectionName": "K",
+      "rowId": "排",
+      "rowInternalId": "25949",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 217.04,
+      "formattedPrice": "$217",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.3300000Z"
+    },
+    "11411512856": {
+      "listingId": "11411512856",
+      "sectionId": 724538,
+      "sectionName": "K",
+      "rowId": "Ok",
+      "rowInternalId": "25949",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 217.04,
+      "formattedPrice": "$217",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.3370000Z"
+    },
+    "11411512878": {
+      "listingId": "11411512878",
+      "sectionId": 724534,
+      "sectionName": "G",
+      "rowId": "chair",
+      "rowInternalId": "25932",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 220.21,
+      "formattedPrice": "$220",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.4130000Z"
+    },
+    "11411513316": {
+      "listingId": "11411513316",
+      "sectionId": 724534,
+      "sectionName": "G",
+      "rowId": "Ok",
+      "rowInternalId": "25932",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 220.21,
+      "formattedPrice": "$220",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:23.4470000Z"
+    },
+    "11352166256": {
+      "listingId": "11352166256",
+      "sectionId": 724539,
+      "sectionName": "L",
+      "rowId": "Row",
+      "rowInternalId": "25953",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 237.92,
+      "formattedPrice": "$238",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-02T11:20:53.2300000Z"
+    },
+    "11411512853": {
+      "listingId": "11411512853",
+      "sectionId": 724539,
+      "sectionName": "L",
+      "rowId": "chair",
+      "rowInternalId": "25953",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 239.32,
+      "formattedPrice": "$239",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.3300000Z"
+    },
+    "11411513311": {
+      "listingId": "11411513311",
+      "sectionId": 724539,
+      "sectionName": "L",
+      "rowId": "Ok",
+      "rowInternalId": "25953",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 239.32,
+      "formattedPrice": "$239",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:23.4430000Z"
+    },
+    "11411513319": {
+      "listingId": "11411513319",
+      "sectionId": 724539,
+      "sectionName": "L",
+      "rowId": "排",
+      "rowInternalId": "25953",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 239.32,
+      "formattedPrice": "$239",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:23.4470000Z"
+    },
+    "11411513333": {
+      "listingId": "11411513333",
+      "sectionId": 724539,
+      "sectionName": "L",
+      "rowId": "Row",
+      "rowInternalId": "25953",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 239.32,
+      "formattedPrice": "$239",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:23.4730000Z"
+    },
+    "12066021978": {
+      "listingId": "12066021978",
+      "sectionId": 724530,
+      "sectionName": "C",
+      "rowId": "CQ",
+      "rowInternalId": "25796",
+      "seat": "20_20",
+      "ticketClassId": 303,
+      "ticketClassName": "Stalls",
+      "availableTickets": 1,
+      "rawPrice": 245.71,
+      "formattedPrice": "$246",
+      "currencyCode": "USD",
+      "ticketTypeName": "Mobile Transfer ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-03-15T08:36:03.2970000Z"
+    },
+    "11411512863": {
+      "listingId": "11411512863",
+      "sectionId": 724541,
+      "sectionName": "N",
+      "rowId": "排",
+      "rowInternalId": "25965",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 249.33,
+      "formattedPrice": "$249",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.3530000Z"
+    },
+    "11411512865": {
+      "listingId": "11411512865",
+      "sectionId": 724541,
+      "sectionName": "N",
+      "rowId": "Row",
+      "rowInternalId": "25965",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 249.33,
+      "formattedPrice": "$249",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.3600000Z"
+    },
+    "11411512877": {
+      "listingId": "11411512877",
+      "sectionId": 724541,
+      "sectionName": "N",
+      "rowId": "Ok",
+      "rowInternalId": "25965",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 249.33,
+      "formattedPrice": "$249",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:22.4100000Z"
+    },
+    "11411513323": {
+      "listingId": "11411513323",
+      "sectionId": 724541,
+      "sectionName": "N",
+      "rowId": "chair",
+      "rowInternalId": "25965",
+      "seat": "_",
+      "ticketClassId": 2116,
+      "ticketClassName": "Circle 1",
+      "availableTickets": 4,
+      "rawPrice": 249.33,
+      "formattedPrice": "$249",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-01-07T11:50:23.4500000Z"
+    },
+    "12031855619": {
+      "listingId": "12031855619",
+      "sectionId": 724529,
+      "sectionName": "B",
+      "rowId": "BJ",
+      "rowInternalId": "25769",
+      "seat": "16_16",
+      "ticketClassId": 303,
+      "ticketClassName": "Stalls",
+      "availableTickets": 1,
+      "rawPrice": 372.76,
+      "formattedPrice": "$373",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2026-03-11T12:27:56.7900000Z"
+    },
+    "11200441863": {
+      "listingId": "11200441863",
+      "sectionId": 528503,
+      "sectionName": "Stalls",
+      "rowId": "Row",
+      "rowInternalId": "25995",
+      "seat": "_",
+      "ticketClassId": 303,
+      "ticketClassName": "Stalls",
+      "availableTickets": 2,
+      "rawPrice": 663.18,
+      "formattedPrice": "$663",
+      "currencyCode": "USD",
+      "ticketTypeName": "Print-at-Home ticket",
+      "listingTypeId": 1,
+      "listingNotes": [
+        "Clear view"
+      ],
+      "createdDateTime": "2025-12-20T01:38:16.3730000Z"
+    }
+  },
+  "meta": {
+    "mapSectionCount": 15,
+    "rawSectionRecordCount": 17,
+    "listingBatchCount": 3,
+    "listingShowMoreClicks": 3,
+    "listingProgress": {
+      "shownCount": 40,
+      "totalCount": 40,
+      "hasShowMore": false
+    },
+    "scraperUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+    "listingObservationWarnings": [],
+    "listingResponseObservations": [
+      {
+        "responseUrl": "https://www.viagogo.com/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465",
+        "path": "/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465",
+        "query": {},
+        "currentPage": 2,
+        "totalCount": 40,
+        "itemCount": 10,
+        "firstListingId": 11986270150,
+        "observedAt": "2026-03-20T13:48:02.359Z",
+        "selected": false
+      },
+      {
+        "responseUrl": "https://www.viagogo.com/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465",
+        "path": "/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465",
+        "query": {},
+        "currentPage": 3,
+        "totalCount": 40,
+        "itemCount": 10,
+        "firstListingId": 11411512872,
+        "observedAt": "2026-03-20T13:48:04.550Z",
+        "selected": false
+      },
+      {
+        "responseUrl": "https://www.viagogo.com/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465",
+        "path": "/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465",
+        "query": {},
+        "currentPage": 4,
+        "totalCount": 40,
+        "itemCount": 10,
+        "firstListingId": 11411513311,
+        "observedAt": "2026-03-20T13:48:06.650Z",
+        "selected": false
+      }
+    ],
+    "selectedListingBatches": [
+      {
+        "responseUrl": "https://www.viagogo.com/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465",
+        "path": "/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465",
+        "query": {},
+        "currentPage": 2,
+        "totalCount": 40,
+        "itemCount": 10,
+        "firstListingId": 11986270150,
+        "observedAt": "2026-03-20T13:48:02.359Z",
+        "batchKey": "page:2"
+      },
+      {
+        "responseUrl": "https://www.viagogo.com/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465",
+        "path": "/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465",
+        "query": {},
+        "currentPage": 3,
+        "totalCount": 40,
+        "itemCount": 10,
+        "firstListingId": 11411512872,
+        "observedAt": "2026-03-20T13:48:04.550Z",
+        "batchKey": "page:3"
+      },
+      {
+        "responseUrl": "https://www.viagogo.com/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465",
+        "path": "/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465",
+        "query": {},
+        "currentPage": 4,
+        "totalCount": 40,
+        "itemCount": 10,
+        "firstListingId": 11411513311,
+        "observedAt": "2026-03-20T13:48:06.650Z",
+        "batchKey": "page:4"
+      }
+    ],
+    "listingBatchConflicts": [],
+    "listingBatchReplacements": [],
+    "listingSettleEvents": [
+      {
+        "phase": "click_1",
+        "progress": {
+          "shownCount": 20,
+          "totalCount": 40,
+          "hasShowMore": true
+        },
+        "stabilized": true,
+        "changed": true,
+        "durationMs": 2052
+      },
+      {
+        "phase": "click_2",
+        "progress": {
+          "shownCount": 30,
+          "totalCount": 40,
+          "hasShowMore": true
+        },
+        "stabilized": true,
+        "changed": true,
+        "durationMs": 2062
+      },
+      {
+        "phase": "click_3",
+        "progress": {
+          "shownCount": 40,
+          "totalCount": 40,
+          "hasShowMore": false
+        },
+        "stabilized": true,
+        "changed": true,
+        "durationMs": 2069
+      }
+    ],
+    "listingFinalSettle": {
+      "progress": {
+        "shownCount": 40,
+        "totalCount": 40,
+        "hasShowMore": false
+      },
+      "stabilized": true,
+      "changed": false,
+      "durationMs": 1546
+    },
+    "runId": "diag-1774014464784-2",
+    "comparisonEntity": "listing",
+    "collectedListingCount": 40
+  }
+}

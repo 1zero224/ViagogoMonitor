@@ -4,6 +4,9 @@ const {
   toIsoDate,
 } = require('./utils');
 
+const NOISY_SPECULATIVE_ROW_LABELS = new Set(['row', 'chair', 'ok', '排']);
+const LISTING_SEAT_PLACEHOLDERS = new Set(['_', '-', '--']);
+
 function normalizeRowId(rowId) {
   if (rowId == null) {
     return null;
@@ -26,6 +29,11 @@ function normalizeListingId(listingId) {
   }
 
   return normalizeWhitespace(String(listingId)) || null;
+}
+
+function normalizeListingStableKey(item) {
+  const aipHash = normalizeWhitespace(item?.aipHash);
+  return aipHash || normalizeListingId(item?.listingId ?? item?.id);
 }
 
 function buildStableRowKey(section) {
@@ -85,23 +93,162 @@ function inferCurrency(section) {
   return null;
 }
 
-function normalizeListingRecord(item) {
-  const listingId = normalizeListingId(item.listingId ?? item.id);
-  if (!listingId) {
+function normalizeListingSeat(...values) {
+  for (const value of values) {
+    const normalized = normalizeWhitespace(value == null ? null : String(value));
+    if (!normalized || LISTING_SEAT_PLACEHOLDERS.has(normalized)) {
+      continue;
+    }
+    return normalized;
+  }
+
+  return null;
+}
+
+function normalizeListingRowContent(rowContent) {
+  const normalized = normalizeWhitespace(rowContent);
+  if (!normalized) {
     return null;
   }
 
+  const match = normalized.match(/^Row\s+(.+)$/i);
+  return normalizeWhitespace(match ? match[1] : normalized);
+}
+
+function isNoisySpeculativeRowLabel(rowLabel) {
+  const normalized = normalizeWhitespace(rowLabel == null ? null : String(rowLabel));
+  if (!normalized) {
+    return false;
+  }
+
+  return NOISY_SPECULATIVE_ROW_LABELS.has(normalized.toLowerCase());
+}
+
+function normalizeListingRowId(item, seat) {
+  const candidates = [
+    normalizeWhitespace(item?.row),
+    normalizeListingRowContent(item?.rowContent),
+  ];
+
+  for (const candidate of candidates) {
+    if (!candidate) {
+      continue;
+    }
+
+    if (item?.isSpeculativeRow && !seat && isNoisySpeculativeRowLabel(candidate)) {
+      continue;
+    }
+
+    return candidate;
+  }
+
+  return null;
+}
+
+function mergeUniqueStrings(values = []) {
+  const merged = [];
+  const seen = new Set();
+
+  for (const value of values) {
+    const normalized = normalizeWhitespace(value == null ? null : String(value));
+    if (!normalized || seen.has(normalized)) {
+      continue;
+    }
+
+    seen.add(normalized);
+    merged.push(normalized);
+  }
+
+  return merged;
+}
+
+function sortListingIds(values = []) {
+  return [...values].sort((left, right) => {
+    const leftText = String(left);
+    const rightText = String(right);
+    const leftNumber = Number(leftText);
+    const rightNumber = Number(rightText);
+
+    if (Number.isFinite(leftNumber) && Number.isFinite(rightNumber) && leftNumber !== rightNumber) {
+      return leftNumber - rightNumber;
+    }
+
+    return leftText.localeCompare(rightText);
+  });
+}
+
+function choosePreferredRowId(left, right) {
+  if (!left) {
+    return right || null;
+  }
+  if (!right) {
+    return left;
+  }
+
+  if (isNoisySpeculativeRowLabel(left) && !isNoisySpeculativeRowLabel(right)) {
+    return right;
+  }
+  if (isNoisySpeculativeRowLabel(right) && !isNoisySpeculativeRowLabel(left)) {
+    return left;
+  }
+
+  return left.length <= right.length ? left : right;
+}
+
+function mergeListingRecords(existing, next) {
+  const sourceListingIds = sortListingIds(
+    mergeUniqueStrings([
+      ...(existing.sourceListingIds || []),
+      ...(next.sourceListingIds || []),
+    ]),
+  );
+  const rawPrice =
+    typeof existing.rawPrice === 'number' && typeof next.rawPrice === 'number'
+      ? Math.min(existing.rawPrice, next.rawPrice)
+      : (existing.rawPrice ?? next.rawPrice ?? null);
+
   return {
+    ...existing,
+    listingId: sourceListingIds[0] || existing.listingId || next.listingId || null,
+    sourceListingIds,
+    rowId: choosePreferredRowId(existing.rowId, next.rowId),
+    rowInternalId: existing.rowInternalId || next.rowInternalId || null,
+    seat: existing.seat || next.seat || null,
+    availableTickets: Math.max(existing.availableTickets || 0, next.availableTickets || 0),
+    rawPrice,
+    formattedPrice: existing.formattedPrice || next.formattedPrice || null,
+    currencyCode: existing.currencyCode || next.currencyCode || null,
+    ticketTypeName: existing.ticketTypeName || next.ticketTypeName || null,
+    listingTypeId: existing.listingTypeId ?? next.listingTypeId ?? null,
+    listingNotes: mergeUniqueStrings([...(existing.listingNotes || []), ...(next.listingNotes || [])]),
+    createdDateTime: existing.createdDateTime || next.createdDateTime || null,
+    duplicateSourceCount: Math.max(existing.duplicateSourceCount || 1, sourceListingIds.length),
+  };
+}
+
+function normalizeListingRecord(item) {
+  const listingKey = normalizeListingStableKey(item);
+  const listingId = normalizeListingId(item.listingId ?? item.id);
+  if (!listingKey || !listingId) {
+    return null;
+  }
+
+  const seat = normalizeListingSeat(item.seat, item.seatFromInternal);
+  const rowId = normalizeListingRowId(item, seat);
+
+  return {
+    listingKey,
     listingId,
+    sourceListingIds: [listingId],
     sectionId: item.sectionId ?? null,
     sectionName:
       normalizeWhitespace(item.sectionMapName) ||
       normalizeWhitespace(item.section) ||
       normalizeWhitespace(item.ticketClassName) ||
       'Unknown Section',
-    rowId: normalizeWhitespace(item.row) || normalizeWhitespace(item.rowContent) || null,
+    rowId,
     rowInternalId: item.rowId != null ? normalizeWhitespace(String(item.rowId)) : null,
-    seat: normalizeWhitespace(item.seat) || normalizeWhitespace(item.seatFromInternal) || null,
+    seat,
     ticketClassId: item.ticketClass ?? item.ticketClassId ?? null,
     ticketClassName: normalizeWhitespace(item.ticketClassName) || null,
     availableTickets: Math.max(0, toNullableNumber(item.availableTickets ?? item.ticketCount) || 0),
@@ -121,14 +268,17 @@ function normalizeListingRecord(item) {
           .filter(Boolean)
       : [],
     createdDateTime: item.createdDateTime || null,
+    aipHash: normalizeWhitespace(item.aipHash) || null,
+    duplicateSourceCount: 1,
   };
 }
 
 function buildListingMap(listingItems = []) {
   const listings = {};
-  let minPrice = null;
-  let totalTicketCount = 0;
-  let currency = null;
+  const stableListings = {};
+  let rawMinPrice = null;
+  let rawTotalTicketCount = 0;
+  let rawCurrency = null;
 
   for (const item of listingItems || []) {
     const listing = normalizeListingRecord(item);
@@ -136,23 +286,45 @@ function buildListingMap(listingItems = []) {
       continue;
     }
 
+    rawTotalTicketCount += listing.availableTickets;
+    if (listing.rawPrice != null && (rawMinPrice == null || listing.rawPrice < rawMinPrice)) {
+      rawMinPrice = listing.rawPrice;
+    }
+    rawCurrency = rawCurrency || listing.currencyCode || null;
     listings[listing.listingId] = listing;
+
+    const existing = stableListings[listing.listingKey];
+    stableListings[listing.listingKey] = existing
+      ? mergeListingRecords(existing, listing)
+      : listing;
   }
 
-  for (const listing of Object.values(listings)) {
-    totalTicketCount += listing.availableTickets;
-    if (listing.rawPrice != null && (minPrice == null || listing.rawPrice < minPrice)) {
-      minPrice = listing.rawPrice;
+  let stableMinPrice = null;
+  let stableTotalTicketCount = 0;
+  let stableCurrency = null;
+  for (const listing of Object.values(stableListings)) {
+    stableTotalTicketCount += listing.availableTickets;
+    if (listing.rawPrice != null && (stableMinPrice == null || listing.rawPrice < stableMinPrice)) {
+      stableMinPrice = listing.rawPrice;
     }
-    currency = currency || listing.currencyCode || null;
+    stableCurrency = stableCurrency || listing.currencyCode || null;
   }
+
+  const rawListingCount = Object.keys(listings).length;
+  const stableListingCount = Object.keys(stableListings).length;
 
   return {
     listings,
-    totalListingCount: Object.keys(listings).length,
-    totalTicketCount,
-    minPrice,
-    currency,
+    stableListings,
+    rawListingCount,
+    rawTotalTicketCount,
+    rawMinPrice,
+    rawCurrency,
+    stableListingCount,
+    stableTotalTicketCount,
+    stableMinPrice,
+    stableCurrency,
+    collapsedDuplicateListingCount: Math.max(0, rawListingCount - stableListingCount),
   };
 }
 
@@ -231,11 +403,11 @@ function buildInventorySnapshot({ eventUrl, eventId, linkId = null, eventDetails
   const rowsWithStock = Object.values(rows).filter((row) => row.ticketCount > 0).length;
   const listingSummary = buildListingMap(listingItems);
 
-  if (listingSummary.totalListingCount > 0) {
-    totalListingCount = listingSummary.totalListingCount;
-    totalTicketCount = listingSummary.totalTicketCount;
-    minPrice = listingSummary.minPrice;
-    currency = listingSummary.currency || currency;
+  if (listingSummary.stableListingCount > 0) {
+    totalListingCount = listingSummary.rawListingCount;
+    totalTicketCount = listingSummary.rawTotalTicketCount;
+    minPrice = listingSummary.rawMinPrice;
+    currency = listingSummary.rawCurrency || currency;
   }
 
   return {
@@ -257,16 +429,22 @@ function buildInventorySnapshot({ eventUrl, eventId, linkId = null, eventDetails
       sectionsWithStock,
       totalListingCount,
       totalTicketCount,
+      stableListingCount: listingSummary.stableListingCount,
+      stableTotalTicketCount: listingSummary.stableTotalTicketCount,
       minPrice,
       currency,
     },
     sections: sectionSummary,
     rows,
     listings: listingSummary.listings,
+    stableListings: listingSummary.stableListings,
     meta: {
       ...meta,
-      comparisonEntity: listingSummary.totalListingCount > 0 ? 'listing' : 'row',
-      collectedListingCount: listingSummary.totalListingCount,
+      comparisonEntity: listingSummary.stableListingCount > 0 ? 'listing' : 'row',
+      collectedListingCount: listingSummary.stableListingCount,
+      rawListingCount: listingSummary.rawListingCount,
+      stableListingCount: listingSummary.stableListingCount,
+      collapsedDuplicateListingCount: listingSummary.collapsedDuplicateListingCount,
     },
   };
 }
@@ -333,5 +511,6 @@ module.exports = {
   buildInventorySnapshot,
   buildPreviousPricesCache,
   normalizeListingId,
+  normalizeListingStableKey,
   buildStableRowKey,
 };

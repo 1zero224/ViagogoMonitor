@@ -9,7 +9,7 @@ This repository keeps the working real-browser scraping path, but changes the bu
 - listing ticket count increases and decreases
 - optional price changes
 
-The runtime now monitors marketplace listings by `listingId` as the primary diff entity, while still keeping row and section rollups for summary and compatibility.
+The runtime keeps page-visible marketplace listings by raw `listingId`, but uses a stable diff key that prefers `aipHash` and falls back to `listingId` to suppress duplicated listing variants and alert jitter, while still keeping row and section rollups for summary and compatibility.
 
 The monitor persists each run to Supabase, keeps `vgg_links.previousprices` as a compatibility cache, and sends grouped Feishu bot alerts.
 

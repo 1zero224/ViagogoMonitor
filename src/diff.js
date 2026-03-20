@@ -14,8 +14,21 @@ function cloneSummaryChanges(previous, current) {
   };
 }
 
+function getComparableListings(snapshot) {
+  const stableListings = snapshot?.stableListings || {};
+  if (Object.keys(stableListings).length > 0) {
+    return stableListings;
+  }
+
+  return snapshot?.listings || {};
+}
+
 function hasListingSnapshot(snapshot) {
-  return Object.keys(snapshot?.listings || {}).length > 0;
+  return Object.keys(getComparableListings(snapshot)).length > 0;
+}
+
+function hasStableListingSnapshot(snapshot) {
+  return Object.keys(snapshot?.stableListings || {}).length > 0;
 }
 
 function createBaseChange(type, rowKey, previousRow, currentRow) {
@@ -38,7 +51,9 @@ function createListingChange(type, listingId, previousListing, currentListing) {
   return {
     type,
     entityType: 'listing',
-    listingId,
+    listingKey: listingId,
+    listingId: source.listingId || listingId,
+    sourceListingIds: source.sourceListingIds || [],
     sectionName: source.sectionName || 'Unknown Section',
     rowId: source.rowId || null,
     seat: source.seat || null,
@@ -158,6 +173,8 @@ function diffSnapshots(previousSnapshot, currentSnapshot, options = {}) {
   const minTicketDelta = Math.max(1, Number(options.minTicketDelta) || 1);
   const currentHasListings = hasListingSnapshot(currentSnapshot);
   const previousHasListings = hasListingSnapshot(previousSnapshot);
+  const currentHasStableListings = hasStableListingSnapshot(currentSnapshot);
+  const previousHasStableListings = hasStableListingSnapshot(previousSnapshot);
 
   if (!previousSnapshot) {
     return {
@@ -186,9 +203,23 @@ function diffSnapshots(previousSnapshot, currentSnapshot, options = {}) {
     };
   }
 
+  if (currentHasStableListings && previousHasListings && !previousHasStableListings) {
+    return {
+      eventId: currentSnapshot.eventId,
+      eventUrl: currentSnapshot.eventUrl,
+      capturedAt: currentSnapshot.capturedAt,
+      previousCapturedAt: previousSnapshot.capturedAt || null,
+      comparisonMode: 'listing',
+      baselineReset: true,
+      summaryChanges: cloneSummaryChanges(previousSnapshot, currentSnapshot),
+      changes: [],
+      changeCount: 0,
+    };
+  }
+
   const comparisonMode = currentHasListings && previousHasListings ? 'listing' : 'row';
   const changes = comparisonMode === 'listing'
-    ? compareListings(previousSnapshot.listings || {}, currentSnapshot.listings || {}, minTicketDelta)
+    ? compareListings(getComparableListings(previousSnapshot), getComparableListings(currentSnapshot), minTicketDelta)
     : compareRows(previousSnapshot.rows || {}, currentSnapshot.rows || {}, minTicketDelta);
 
   return {

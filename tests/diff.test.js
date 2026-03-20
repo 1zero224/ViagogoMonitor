@@ -272,3 +272,109 @@ test('diffSnapshots resets baseline when previous snapshot lacks listing-level d
   assert.equal(diff.baselineReset, true);
   assert.equal(diff.changeCount, 0);
 });
+
+test('diffSnapshots uses aipHash as the stable listing identity when raw listing ids rotate', () => {
+  const previous = buildListingSnapshot(
+    [
+      {
+        id: 1001,
+        aipHash: 'stable-a',
+        sectionId: 724540,
+        sectionMapName: 'M',
+        row: 'chair',
+        rowContent: 'Row chair',
+        rowId: 25957,
+        seat: '_',
+        isSpeculativeRow: true,
+        availableTickets: 4,
+        rawPrice: 204.08,
+        price: '$204',
+        buyerCurrencyCode: 'USD',
+      },
+    ],
+    '2026-03-19T12:00:00.000Z',
+  );
+
+  const current = buildListingSnapshot(
+    [
+      {
+        id: 2002,
+        aipHash: 'stable-a',
+        sectionId: 724540,
+        sectionMapName: 'M',
+        row: 'Row',
+        rowContent: 'Row Row',
+        rowId: 25957,
+        seat: '_',
+        isSpeculativeRow: true,
+        availableTickets: 4,
+        rawPrice: 199.99,
+        price: '$200',
+        buyerCurrencyCode: 'USD',
+      },
+    ],
+    '2026-03-19T12:05:00.000Z',
+  );
+
+  const diff = diffSnapshots(previous, current, { minTicketDelta: 1 });
+
+  assert.equal(diff.comparisonMode, 'listing');
+  assert.deepEqual(
+    diff.changes.map((change) => change.type),
+    ['listing_price_decreased'],
+  );
+  assert.equal(diff.changes[0].listingKey, 'stable-a');
+  assert.equal(diff.changes[0].listingId, '2002');
+});
+
+test('diffSnapshots resets listing baseline when the previous snapshot predates stableListings support', () => {
+  const previous = {
+    eventId: '159991465',
+    eventUrl: 'https://www.viagogo.com/Concert-Tickets/Other-Concerts/ZUTOMAYO-Tickets/E-159991465?quantity=1',
+    capturedAt: '2026-03-19T12:00:00.000Z',
+    summary: {
+      totalListingCount: 40,
+      totalTicketCount: 143,
+      rowsWithStock: 13,
+      sectionsWithStock: 13,
+      minPrice: 132.36,
+    },
+    listings: {
+      '11411512840': {
+        listingId: '11411512840',
+        sectionName: 'M',
+        rowId: null,
+        seat: null,
+        availableTickets: 4,
+        rawPrice: 204.08,
+      },
+    },
+  };
+
+  const current = buildListingSnapshot(
+    [
+      {
+        id: 2002,
+        aipHash: 'stable-a',
+        sectionId: 724540,
+        sectionMapName: 'M',
+        row: 'Row',
+        rowContent: 'Row Row',
+        rowId: 25957,
+        seat: '_',
+        isSpeculativeRow: true,
+        availableTickets: 4,
+        rawPrice: 199.99,
+        price: '$200',
+        buyerCurrencyCode: 'USD',
+      },
+    ],
+    '2026-03-19T12:05:00.000Z',
+  );
+
+  const diff = diffSnapshots(previous, current, { minTicketDelta: 1 });
+
+  assert.equal(diff.comparisonMode, 'listing');
+  assert.equal(diff.baselineReset, true);
+  assert.equal(diff.changeCount, 0);
+});

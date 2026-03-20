@@ -71,6 +71,28 @@ test('buildInventoryMessageText builds a grouped Feishu-friendly plain text mess
   assert.match(text, /新增挂单: M15 \/ 行 A \/ 座位 1-2 \/ 挂单 9001/);
 });
 
+test('buildInventoryMessageText omits noisy row and seat placeholders when normalized listing metadata is empty', () => {
+  const payload = buildPayload();
+  payload.diff.changes = [
+    {
+      type: 'new_listing_available',
+      sectionName: 'M',
+      rowId: null,
+      seat: null,
+      listingId: '9001',
+      newTicketCount: 2,
+      newPrice: 199,
+    },
+  ];
+  payload.diff.changeCount = 1;
+
+  const text = buildInventoryMessageText(payload);
+
+  assert.match(text, /新增挂单: M \/ 挂单 9001/);
+  assert.doesNotMatch(text, /座位 _/);
+  assert.doesNotMatch(text, /行 null/);
+});
+
 test('buildFeishuMessagePayload wraps the text in the expected webhook contract', () => {
   const payload = buildFeishuMessagePayload(buildPayload());
 
